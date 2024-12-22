@@ -48,3 +48,7 @@ export const createJWT = (user: User) => {
     { expiresIn: "7d" }
   );
 };
+
+export const verifyPassword = (a: string, b: string) => {
+  return bcrypt.compare(a, b);
+};

@@ -56,14 +56,10 @@ const $signUp = createServerFn({ method: "POST" })
     const jwt = createJWT(newUser);
 
     const session = await useAuthSession();
-    session.update({
+    return await session.update({
       token: jwt,
       user: clientUserSchema.strip().parse(newUser),
     });
-    return {
-      data: "success",
-      error: null,
-    };
   });
 
 export function SignUpForm({
@@ -97,14 +93,13 @@ export function SignUpForm({
             title: error,
           });
         })
-        .with({ data: P.string }, ({ data }) => {
+        .otherwise(() => {
           toast({
             variant: "success",
             title: "Success!",
           });
           router.invalidate();
-        })
-        .exhaustive();
+        });
     });
   });
 
