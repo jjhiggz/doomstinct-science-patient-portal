@@ -13,6 +13,7 @@ import { DefaultCatchBoundary } from "~/components/DefaultCatchBoundary";
 import { NotFound } from "~/components/NotFound";
 import appCss from "~/styles/app.css?url";
 import { seo } from "~/utils/seo";
+import { Toaster } from "~/shadcn/components/ui/toaster";
 
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient;
@@ -69,6 +70,7 @@ export const Route = createRootRouteWithContext<{
 function RootComponent() {
   return (
     <RootDocument>
+      <Toaster />
       <Outlet />
     </RootDocument>
   );

@@ -1,19 +1,21 @@
 import { Button } from "~/shadcn/components/ui/button";
 import { Input } from "~/shadcn/components/ui/input";
 import { Label } from "~/shadcn/components/ui/label";
-import { cn } from "../utils/classnames";
+import { cn } from "../../../shadcn/utils/classnames";
 import { Link } from "@tanstack/react-router";
+import { createServerFn } from "@tanstack/start";
 
-export function SignUpForm({
+const login = createServerFn();
+export function LoginForm({
   className,
   ...props
 }: React.ComponentPropsWithoutRef<"form">) {
   return (
     <form className={cn("flex flex-col gap-6", className)} {...props}>
       <div className="flex flex-col items-center gap-2 text-center">
-        <h1 className="text-2xl font-bold">Create your account</h1>
+        <h1 className="text-2xl font-bold">Login to your account</h1>
         <p className="text-balance text-sm text-muted-foreground">
-          Enter your email and password below to sign up for an account
+          Enter your email below to login to your account
         </p>
       </div>
       <div className="grid gap-6">
@@ -22,15 +24,19 @@ export function SignUpForm({
           <Input id="email" type="email" placeholder="m@example.com" required />
         </div>
         <div className="grid gap-2">
-          <Label htmlFor="password">Password</Label>
+          <div className="flex items-center">
+            <Label htmlFor="password">Password</Label>
+            <a
+              href="#"
+              className="ml-auto text-sm underline-offset-4 hover:underline"
+            >
+              Forgot your password?
+            </a>
+          </div>
           <Input id="password" type="password" required />
         </div>
-        <div className="grid gap-2">
-          <Label htmlFor="confirmPassword">Confirm Password</Label>
-          <Input id="confirmPassword" type="password" required />
-        </div>
         <Button type="submit" className="w-full">
-          Sign Up
+          Login
         </Button>
         <div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-border">
           <span className="relative z-10 bg-background px-2 text-muted-foreground">
@@ -44,13 +50,13 @@ export function SignUpForm({
               fill="currentColor"
             />
           </svg>
-          Sign up with GitHub
+          Login with GitHub
         </Button>
       </div>
       <div className="text-center text-sm">
-        Already have an account?{" "}
-        <Link to="/login" className="underline underline-offset-4">
-          Login
+        Don&apos;t have an account?{" "}
+        <Link to="/sign-up" className="underline underline-offset-4">
+          Sign up
         </Link>
       </div>
     </form>
