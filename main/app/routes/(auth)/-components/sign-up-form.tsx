@@ -2,7 +2,8 @@ import { Button } from "~/shadcn/components/ui/button";
 import { Input } from "~/shadcn/components/ui/input";
 import { Label } from "~/shadcn/components/ui/label";
 import { cn } from "../../../shadcn/utils/classnames";
-import { Link } from "@tanstack/react-router";
+import { Link, useRouter } from "@tanstack/react-router";
+import { match, P } from "ts-pattern";
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -10,6 +11,9 @@ import { z } from "zod";
 import { createServerFn } from "@tanstack/start";
 import { toast } from "~/shadcn/hooks/use-toast";
 import { prisma } from "~/db";
+import { clientUserSchema } from "../-helpers/auth-schemas";
+import { useAuthSession } from "~/session";
+import { createUser, createJWT } from "../-helpers/auth-utils.server";
 
 const signUpSchema = z.object({
   email: z.string().email("Please enter a valid email"),
@@ -17,7 +21,7 @@ const signUpSchema = z.object({
   confirmPassword: z.string(),
 });
 
-const signUp = createServerFn({ method: "POST" })
+const $signUp = createServerFn({ method: "POST" })
   .validator(
     signUpSchema.omit({
       confirmPassword: true,
@@ -32,15 +36,34 @@ const signUp = createServerFn({ method: "POST" })
 
     if (existingUser) {
       return {
+        data: null,
         error: "We're  sorry that username already exists",
-      };
+      } as const;
     }
 
-    const newUser = await prisma.user.create({
-      data: {
-        email,
-      },
+    const newUser = await createUser({
+      email: data.email,
+      password: data.password,
     });
+
+    if (!newUser) {
+      return {
+        data: null,
+        error: "Could not create user",
+      } as const;
+    }
+
+    const jwt = createJWT(newUser);
+
+    const session = await useAuthSession();
+    session.update({
+      token: jwt,
+      user: clientUserSchema.strip().parse(newUser),
+    });
+    return {
+      data: "success",
+      error: null,
+    };
   });
 
 export function SignUpForm({
@@ -49,6 +72,7 @@ export function SignUpForm({
 }: React.ComponentPropsWithoutRef<"form">) {
   type SignUpSchema = z.infer<typeof signUpSchema>;
 
+  const router = useRouter();
   const {
     register,
     handleSubmit,
@@ -63,9 +87,24 @@ export function SignUpForm({
   });
 
   const onSubmit = handleSubmit((data: SignUpSchema) => {
-    toast({
-      title: "Scheduled: Catch up ",
-      description: "Friday, February 10, 2023 at 5:57 PM",
+    $signUp({
+      data,
+    }).then((result) => {
+      return match(result)
+        .with({ data: null, error: P.string }, ({ error }) => {
+          toast({
+            variant: "destructive",
+            title: error,
+          });
+        })
+        .with({ data: P.string }, ({ data }) => {
+          toast({
+            variant: "success",
+            title: "Success!",
+          });
+          router.invalidate();
+        })
+        .exhaustive();
     });
   });
 

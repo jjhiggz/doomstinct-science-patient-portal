@@ -6,7 +6,7 @@ import {
 } from "@tanstack/react-router";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { TanStackRouterDevtools } from "@tanstack/router-devtools";
-import { Meta, Scripts } from "@tanstack/start";
+import { createServerFn, Meta, Scripts } from "@tanstack/start";
 import * as React from "react";
 import type { QueryClient } from "@tanstack/react-query";
 import { DefaultCatchBoundary } from "~/components/DefaultCatchBoundary";
@@ -14,6 +14,13 @@ import { NotFound } from "~/components/NotFound";
 import appCss from "~/styles/app.css?url";
 import { seo } from "~/utils/seo";
 import { Toaster } from "~/shadcn/components/ui/toaster";
+import { useAuthSession } from "../session";
+
+const $getUser = createServerFn().handler(async () => {
+  const user = await useAuthSession();
+  if (!user.data.user) return null;
+  else return user.data.user;
+});
 
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient;
@@ -63,6 +70,13 @@ export const Route = createRootRouteWithContext<{
       </RootDocument>
     );
   },
+  beforeLoad: async () => {
+    const user = await $getUser();
+    return {
+      user,
+    };
+  },
+
   notFoundComponent: () => <NotFound />,
   component: RootComponent,
 });
