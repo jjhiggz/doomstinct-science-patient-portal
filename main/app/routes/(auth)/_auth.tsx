@@ -16,7 +16,6 @@ import doomslayerPic from "/doomslayer.jpg?url";
 
 export const Route = createFileRoute("/(auth)/_auth")({
   loader: ({ context }) => {
-    console.log(context.user);
     if (context.user) {
       throw redirect({ to: "/" });
     }
