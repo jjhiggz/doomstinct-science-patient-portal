@@ -1,6 +1,6 @@
 import { Separator } from "@radix-ui/react-separator";
-import { createFileRoute, Link, Outlet } from "@tanstack/react-router";
-import { CustomerSidebar } from "~/shadcn/components/customer-sidebar";
+import { createFileRoute } from "@tanstack/react-router";
+import { DashboardSidebar } from "~/shadcn/components/dashboard-sidebar";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -22,7 +22,11 @@ export const Route = createFileRoute("/dashboard/customer")({
 function RouteComponent() {
   return (
     <SidebarProvider>
-      <CustomerSidebar />
+      <DashboardSidebar
+        data={{
+          navMain: [],
+        }}
+      />
       <SidebarInset>
         <header className="flex items-center gap-2 border-b h-16 shrink-0">
           <div className="flex items-center gap-2 px-3">

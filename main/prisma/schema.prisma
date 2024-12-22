@@ -14,16 +14,93 @@ datasource db {
 }
 
 model User {
-  id                 String              @id @default(cuid())
-  email              String              @unique
-  name               String              @default("") // for example "Ponte Restaurant Group"
-  role               Role
-  createdAt          DateTime            @default(now())
-  updatedAt          DateTime            @updatedAt
-  stripeCustomerId   String?
-  stripePriceId      String?
-  password           Password?
-  passwordResetToken PasswordResetToken?
+  id                    String              @id @default(cuid())
+  email                 String              @unique
+  name                  String              @default("") // for example "Ponte Restaurant Group"
+  role                  Role
+  createdAt             DateTime            @default(now())
+  updatedAt             DateTime            @updatedAt
+  stripeCustomerId      String?
+  stripePriceId         String?
+  password              Password?
+  passwordResetToken    PasswordResetToken?
+  patientId             String?
+  providesHealthcareFor User[]              @relation("HealthcareProvision")
+  healthcareProvidedBy  User[]              @relation("HealthcareProvision")
+  Patient               Patient[]
+  CustomerData          CustomerData?
+  ProviderData          ProviderData?
+}
+
+model CustomerData {
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  firstName   String?
+  lastName    String?
+  address     String?
+  phone       String?
+  preferences String? // Customer preferences/notes
+  billingInfo String? // Billing information
+  timezone    String? // Customer's timezone for scheduling
+  language    String? // Preferred language for communications
+  marketing   Boolean  @default(false) // Marketing preferences
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      String   @unique
+}
+
+model ProviderData {
+  id                String   @id @default(cuid())
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  firstName         String? // Provider's first name
+  lastName          String? // Provider's last name
+  businessName      String? // Legal business name
+  licenseNumber     String? // Professional license/registration number
+  specialties       String[] // Array of specialization areas
+  businessHours     String? // Operating hours
+  serviceLocations  String[] // Service locations/addresses
+  certifications    String[] // Professional certifications
+  insuranceAccepted String[] // List of accepted insurance providers
+  staffSize         Int? // Number of staff members
+  emergencyService  Boolean  @default(false) // Whether 24/7 emergency service is available
+  rating            Float? // Average rating from reviews (1-5)
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId            String   @unique
+}
+
+model Patient {
+  id          String        @id @default(cuid())
+  name        String
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  owner       User          @relation(fields: [ownerId], references: [id])
+  ownerId     String
+  PatientData PatientData[]
+}
+
+model PatientData {
+  id               String    @id @default(cuid())
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  species          String?
+  breed            String?
+  birthDate        DateTime?
+  weight           Float? // in kg
+  sex              String?
+  microchipId      String?   @unique
+  allergies        String?
+  medications      String[]
+  medicalNotes     String? // General medical history/notes
+  dietaryNeeds     String?
+  lastVisit        DateTime?
+  nextCheckup      DateTime?
+  ownerNotes       String? // Notes from pet owner
+  isNeutered       Boolean?
+  insurance        String? // Pet insurance details
+  emergencyContact String?
+  patient          Patient   @relation(fields: [patientId], references: [id])
+  patientId        String
 }
 
 model PasswordResetToken {

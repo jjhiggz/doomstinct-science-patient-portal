@@ -12,7 +12,8 @@ import { toast } from "~/shadcn/hooks/use-toast";
 import { prisma } from "~/db";
 import { clientUserSchema } from "../-helpers/auth-schemas";
 import { useAuthSession } from "~/session";
-import { verifyPassword, createJWT } from "../-helpers/auth-utils.server";
+import { verifyPassword } from "../-helpers/auth-utils.server";
+import { createJWT } from "../-helpers/jwt";
 
 const loginSchema = z.object({
   email: z.string().email("Please enter a valid email"),
