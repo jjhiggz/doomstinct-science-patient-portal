@@ -24,7 +24,7 @@ export const DashboardBreadcrumbList = () => {
   const location = useLocation();
   const paths = location.pathname
     .split("/")
-    .filter((n) => n.trim().length > 0)
+    .filter((n) => n.trim().length > 0 && n !== "dashboard")
     .map(normalize);
 
   return (
