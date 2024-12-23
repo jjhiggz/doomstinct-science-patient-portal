@@ -99,6 +99,7 @@ const $addCustomers = createServerFn({ method: "POST" })
           data: {
             healthcareProvidedBy: {
               connect: {
+                role: "HEALTH_SIDE",
                 id: context.user.id,
               },
             },
@@ -156,6 +157,9 @@ function RouteComponent() {
       e.preventDefault();
       // Process the selected customers
       const selectedCustomers = Array.from(customerSet);
+      if (selectedCustomers.length === 0) {
+        return toast({ title: "Please select customers" });
+      }
       addCustomers({ data: selectedCustomers })
         .then(() => {
           toast({ title: "Added 😊", variant: "success" });

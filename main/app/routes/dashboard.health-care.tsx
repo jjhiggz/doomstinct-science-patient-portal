@@ -16,19 +16,16 @@ function RouteComponent() {
   return (
     <SidebarProvider>
       <DashboardSidebar
+        forUserRole="HEALTH_SIDE"
         data={{
           navMain: [
             {
               title: "Customers",
-              url: "",
+              url: "/dashboard/health-care/customers",
               items: [
                 {
                   title: "Add new Customer",
                   url: "/dashboard/health-care/add-customer",
-                },
-                {
-                  title: "Edit Customer",
-                  url: "",
                 },
               ],
             },

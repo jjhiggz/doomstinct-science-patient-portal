@@ -9,9 +9,9 @@ function RouteComponent() {
     <div className="gap-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 p-4">
       {[
         {
-          title: "Schedule Appointment",
-          description: "Book a new appointment or manage existing ones",
-          action: "Schedule Now",
+          title: "Add Customer",
+          description: "Add a customer to your account",
+          action: "Add a Customer",
         },
         {
           title: "Patient Records",

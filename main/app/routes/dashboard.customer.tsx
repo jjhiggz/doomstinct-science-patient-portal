@@ -23,6 +23,7 @@ function RouteComponent() {
   return (
     <SidebarProvider>
       <DashboardSidebar
+        forUserRole="PATIENT_SIDE"
         data={{
           navMain: [],
           // title: "",
