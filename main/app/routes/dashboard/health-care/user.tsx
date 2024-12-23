@@ -1,7 +1,7 @@
-import { createFileRoute, useLoaderData } from "@tanstack/react-router";
-import { createServerFn } from "@tanstack/start";
-import { prisma } from "~/db";
-import { requireUserMiddleware } from "~/middleware/user.middleware";
+import { createFileRoute, useLoaderData } from '@tanstack/react-router'
+import { createServerFn } from '@tanstack/start'
+import { prisma } from '~/db'
+import { requireUserMiddleware } from '~/middleware/user.middleware'
 
 const $getUserData = createServerFn()
   .middleware([requireUserMiddleware])
@@ -10,18 +10,18 @@ const $getUserData = createServerFn()
       where: {
         userId: user.id,
       },
-    });
-  });
+    })
+  })
 
-export const Route = createFileRoute("/dashboard/health-care/user")({
+export const Route = createFileRoute('/dashboard/health-care/user')({
   component: RouteComponent,
   loader: async () => {
-    return $getUserData();
+    return $getUserData()
   },
-});
+})
 
 function RouteComponent() {
-  const data = useLoaderData({ from: "/dashboard/health-care/user" });
+  const data = useLoaderData({ from: '/dashboard/health-care/user' })
 
   return (
     <div className="p-4">
@@ -41,19 +41,19 @@ function RouteComponent() {
             {Object.entries(data || {}).map(([key, value], index) => (
               <tr
                 key={key}
-                className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}
+                className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}
               >
                 <td className="px-6 py-4 text-gray-500 text-sm capitalize">
-                  {key.replace(/([A-Z])/g, " $1").trim()}
+                  {key.replace(/([A-Z])/g, ' $1').trim()}
                 </td>
                 <td className="px-6 py-4 text-gray-900 text-sm">
                   {Array.isArray(value)
-                    ? value.join(", ")
-                    : typeof value === "boolean"
+                    ? value.join(', ')
+                    : typeof value === 'boolean'
                       ? value
-                        ? "Yes"
-                        : "No"
-                      : value?.toString() || "N/A"}
+                        ? 'Yes'
+                        : 'No'
+                      : value?.toString() || 'N/A'}
                 </td>
               </tr>
             ))}
@@ -61,5 +61,5 @@ function RouteComponent() {
         </table>
       </div>
     </div>
-  );
+  )
 }

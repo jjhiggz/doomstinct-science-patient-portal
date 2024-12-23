@@ -3,15 +3,15 @@ import {
   useLoaderData,
   useNavigate,
   useRouter,
-} from "@tanstack/react-router";
-import { createServerFn, useServerFn } from "@tanstack/start";
-import { SearchIcon } from "lucide-react";
-import { useCallback, useState } from "react";
-import { z } from "zod";
-import { prisma } from "~/db";
-import { useOnDebouncedState } from "~/hooks/useOnDebounced";
-import { requireUserMiddleware } from "~/middleware/user.middleware";
-import { Button } from "~/shadcn/components/ui/button";
+} from '@tanstack/react-router'
+import { createServerFn, useServerFn } from '@tanstack/start'
+import { SearchIcon } from 'lucide-react'
+import { useCallback, useState } from 'react'
+import { z } from 'zod'
+import { prisma } from '~/db'
+import { useOnDebouncedState } from '~/hooks/useOnDebounced'
+import { requireUserMiddleware } from '~/middleware/user.middleware'
+import { Button } from '~/shadcn/components/ui/button'
 import {
   TableBody,
   TableCell,
@@ -19,14 +19,14 @@ import {
   TableHeader,
   TableRow,
   Table,
-} from "~/shadcn/components/ui/table";
-import { toast } from "~/shadcn/hooks/use-toast";
-import { truncate } from "~/utils/truncate";
-import { validateWithZod } from "~/utils/validateWithZod";
+} from '~/shadcn/components/ui/table'
+import { toast } from '~/shadcn/hooks/use-toast'
+import { truncate } from '~/utils/truncate'
+import { validateWithZod } from '~/utils/validateWithZod'
 
-const truncateTo = 10;
-const pageSize = 10;
-const $findCustomers = createServerFn({ method: "POST" })
+const truncateTo = 10
+const pageSize = 10
+const $findCustomers = createServerFn({ method: 'POST' })
   .middleware([requireUserMiddleware])
   .validator(
     validateWithZod(
@@ -34,16 +34,16 @@ const $findCustomers = createServerFn({ method: "POST" })
         .object({
           search: z.string().optional(),
         })
-        .optional()
-    )
+        .optional(),
+    ),
   )
   .handler(async ({ data, context: { user } }) => {
-    const searchTerm = data?.search;
+    const searchTerm = data?.search
     if (!searchTerm) {
       return await prisma.user.findMany({
         where: {
           role: {
-            equals: "PATIENT_SIDE",
+            equals: 'PATIENT_SIDE',
           },
           healthcareProvidedBy: {
             none: {
@@ -55,12 +55,12 @@ const $findCustomers = createServerFn({ method: "POST" })
           CustomerData: true,
         },
         take: pageSize,
-      });
+      })
     }
     return await prisma.user.findMany({
       where: {
         role: {
-          equals: "PATIENT_SIDE",
+          equals: 'PATIENT_SIDE',
         },
         healthcareProvidedBy: {
           none: {
@@ -85,10 +85,10 @@ const $findCustomers = createServerFn({ method: "POST" })
         CustomerData: true,
       },
       take: pageSize,
-    });
-  });
+    })
+  })
 
-const $addCustomers = createServerFn({ method: "POST" })
+const $addCustomers = createServerFn({ method: 'POST' })
   .middleware([requireUserMiddleware])
   .validator(validateWithZod(z.array(z.string())))
   .handler(({ data, context }) => {
@@ -101,20 +101,20 @@ const $addCustomers = createServerFn({ method: "POST" })
           data: {
             healthcareProvidedBy: {
               connect: {
-                role: "HEALTH_SIDE",
+                role: 'HEALTH_SIDE',
                 id: context.user.id,
               },
             },
           },
-        })
-      )
-    );
-  });
+        }),
+      ),
+    )
+  })
 
-export const Route = createFileRoute("/dashboard/health-care/add-customer")({
+export const Route = createFileRoute('/dashboard/health-care/add-customer')({
   component: RouteComponent,
   validateSearch: (search) => {
-    return z.object({ search: z.string().optional() }).optional().parse(search);
+    return z.object({ search: z.string().optional() }).optional().parse(search)
   },
   loaderDeps: (search) => search,
   loader: async ({ deps: { search } }) => {
@@ -124,58 +124,58 @@ export const Route = createFileRoute("/dashboard/health-care/add-customer")({
           search: search?.search,
         },
       }),
-    };
+    }
   },
-});
+})
 
 function RouteComponent() {
   const { customers } = useLoaderData({
-    from: "/dashboard/health-care/add-customer",
-  });
+    from: '/dashboard/health-care/add-customer',
+  })
 
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState('')
 
-  const [customerSet, setCustomerSet] = useState<Set<string>>(new Set());
+  const [customerSet, setCustomerSet] = useState<Set<string>>(new Set())
 
-  const navigate = useNavigate();
-  const router = useRouter();
-  const addCustomers = useServerFn($addCustomers);
+  const navigate = useNavigate()
+  const router = useRouter()
+  const addCustomers = useServerFn($addCustomers)
 
   useOnDebouncedState({
     handler: (searchTerm) => {
       navigate({
-        from: "/dashboard/health-care/add-customer",
+        from: '/dashboard/health-care/add-customer',
         search: {
           search: searchTerm,
         },
-      });
+      })
     },
     watchState: searchTerm,
     time: 400,
-  });
+  })
 
   const handleSubmit = useCallback(
     (e: React.FormEvent) => {
-      e.preventDefault();
+      e.preventDefault()
       // Process the selected customers
-      const selectedCustomers = Array.from(customerSet);
+      const selectedCustomers = Array.from(customerSet)
       if (selectedCustomers.length === 0) {
-        return toast({ title: "Please select customers" });
+        return toast({ title: 'Please select customers' })
       }
       addCustomers({ data: selectedCustomers })
         .then(() => {
-          toast({ title: "Added 😊", variant: "success" });
-          router.invalidate();
+          toast({ title: 'Added 😊', variant: 'success' })
+          router.invalidate()
         })
         .catch(() => {
-          toast({ title: "Something went wrong 😞", variant: "destructive" });
-          router.invalidate();
-        });
+          toast({ title: 'Something went wrong 😞', variant: 'destructive' })
+          router.invalidate()
+        })
 
       // Add your form submission logic here
     },
-    [customerSet]
-  );
+    [customerSet],
+  )
 
   return (
     <div>
@@ -191,7 +191,7 @@ function RouteComponent() {
             placeholder="Search customers..."
             className="px-3 py-2 border rounded-md w-full max-w-sm"
             onChange={(e) => {
-              setSearchTerm(e.target.value);
+              setSearchTerm(e.target.value)
             }}
           />
         </div>
@@ -215,7 +215,7 @@ function RouteComponent() {
               </TableHeader>
               <TableBody>
                 {customers.map((customer) => {
-                  const customerData = customer.CustomerData;
+                  const customerData = customer.CustomerData
                   return (
                     <TableRow key={customerData?.id}>
                       <TableCell className="flex justify-center items-center">
@@ -224,53 +224,53 @@ function RouteComponent() {
                           value={customer.id}
                           onChange={(e) => {
                             if (e.target.checked) {
-                              customerSet.add(customer.id);
-                              setCustomerSet(customerSet);
+                              customerSet.add(customer.id)
+                              setCustomerSet(customerSet)
                             } else {
-                              customerSet.delete(customer.id);
-                              setCustomerSet(customerSet);
+                              customerSet.delete(customer.id)
+                              setCustomerSet(customerSet)
                             }
                           }}
                         />
                       </TableCell>
                       <TableCell>
-                        {truncate(customer?.email || "N/A", truncateTo)}
+                        {truncate(customer?.email || 'N/A', truncateTo)}
                       </TableCell>
                       <TableCell>
-                        {truncate(customerData?.firstName || "N/A", truncateTo)}
+                        {truncate(customerData?.firstName || 'N/A', truncateTo)}
                       </TableCell>
                       <TableCell>
-                        {truncate(customerData?.lastName || "N/A", truncateTo)}
+                        {truncate(customerData?.lastName || 'N/A', truncateTo)}
                       </TableCell>
                       <TableCell>
-                        {truncate(customerData?.address || "N/A", truncateTo)}
+                        {truncate(customerData?.address || 'N/A', truncateTo)}
                       </TableCell>
                       <TableCell>
-                        {truncate(customerData?.phone || "N/A", truncateTo)}
+                        {truncate(customerData?.phone || 'N/A', truncateTo)}
                       </TableCell>
                       <TableCell>
                         {truncate(
-                          customerData?.preferences || "N/A",
-                          truncateTo
+                          customerData?.preferences || 'N/A',
+                          truncateTo,
                         )}
                       </TableCell>
                       <TableCell>
                         {truncate(
-                          customerData?.billingInfo || "N/A",
-                          truncateTo
+                          customerData?.billingInfo || 'N/A',
+                          truncateTo,
                         )}
                       </TableCell>
                       <TableCell>
-                        {truncate(customerData?.timezone || "N/A", truncateTo)}
+                        {truncate(customerData?.timezone || 'N/A', truncateTo)}
                       </TableCell>
                       <TableCell>
-                        {truncate(customerData?.language || "N/A", truncateTo)}
+                        {truncate(customerData?.language || 'N/A', truncateTo)}
                       </TableCell>
                       <TableCell>
-                        {customerData?.marketing ? "Yes" : "No"}
+                        {customerData?.marketing ? 'Yes' : 'No'}
                       </TableCell>
                     </TableRow>
-                  );
+                  )
                 })}
               </TableBody>
             </Table>
@@ -280,5 +280,5 @@ function RouteComponent() {
         </form>
       </div>
     </div>
-  );
+  )
 }

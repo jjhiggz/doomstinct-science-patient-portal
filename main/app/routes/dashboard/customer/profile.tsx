@@ -8,7 +8,6 @@ import { Input } from "~/shadcn/components/ui/input";
 const $getUserProfile = createServerFn()
   .middleware([requireUserMiddleware])
   .handler(async ({ context: { user } }) => {
-    console.log({ user });
     return await prisma.user.findUniqueOrThrow({
       where: { id: user.id },
       select: {
@@ -16,12 +15,12 @@ const $getUserProfile = createServerFn()
         email: true,
         createdAt: true,
         updatedAt: true,
-        ProviderData: true,
+        CustomerData: true,
       },
     });
   });
 
-export const Route = createFileRoute("/dashboard/health-care/profile")({
+export const Route = createFileRoute("/dashboard/customer/profile")({
   component: RouteComponent,
   loader: async () => {
     return {
@@ -32,7 +31,7 @@ export const Route = createFileRoute("/dashboard/health-care/profile")({
 
 function RouteComponent() {
   const { user } = useLoaderData({
-    from: "/dashboard/health-care/profile",
+    from: "/dashboard/customer/profile",
   });
 
   return (

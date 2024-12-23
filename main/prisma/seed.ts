@@ -98,7 +98,7 @@ const seedUsers = async () => {
   // Create patients for instinct provider
   const instinctCustomers = await Promise.all([
     createUser({
-      email: "alice.johnson@customer.com",
+      email: "jon@jon.com",
       password: "password123",
     }),
     createUser({
