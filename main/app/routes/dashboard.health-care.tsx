@@ -1,5 +1,5 @@
 import { Separator } from "@radix-ui/react-separator";
-import { createFileRoute, Outlet } from "@tanstack/react-router";
+import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { DashboardBreadcrumbList } from "~/shadcn/components/dashboard-breadcrumb-list";
 import { DashboardSidebar } from "~/shadcn/components/dashboard-sidebar";
 import {
@@ -10,6 +10,10 @@ import {
 
 export const Route = createFileRoute("/dashboard/health-care")({
   component: RouteComponent,
+  loader: ({ context }) => {
+    if (context.user.role === "PATIENT_SIDE")
+      throw redirect({ to: "/dashboard/customer" });
+  },
 });
 
 function RouteComponent() {

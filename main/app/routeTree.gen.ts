@@ -14,6 +14,7 @@ import { createFileRoute } from '@tanstack/react-router'
 
 import { Route as rootRoute } from './routes/__root'
 import { Route as LogoutImport } from './routes/logout'
+import { Route as DashboardImport } from './routes/dashboard'
 import { Route as IndexImport } from './routes/index'
 import { Route as DashboardHealthCareImport } from './routes/dashboard.health-care'
 import { Route as DashboardCustomerImport } from './routes/dashboard.customer'
@@ -45,6 +46,12 @@ const LogoutRoute = LogoutImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const DashboardRoute = DashboardImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => rootRoute,
+} as any)
+
 const IndexRoute = IndexImport.update({
   id: '/',
   path: '/',
@@ -52,15 +59,15 @@ const IndexRoute = IndexImport.update({
 } as any)
 
 const DashboardHealthCareRoute = DashboardHealthCareImport.update({
-  id: '/dashboard/health-care',
-  path: '/dashboard/health-care',
-  getParentRoute: () => rootRoute,
+  id: '/health-care',
+  path: '/health-care',
+  getParentRoute: () => DashboardRoute,
 } as any)
 
 const DashboardCustomerRoute = DashboardCustomerImport.update({
-  id: '/dashboard/customer',
-  path: '/dashboard/customer',
-  getParentRoute: () => rootRoute,
+  id: '/customer',
+  path: '/customer',
+  getParentRoute: () => DashboardRoute,
 } as any)
 
 const authAuthRoute = authAuthImport.update({
@@ -138,6 +145,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexImport
       parentRoute: typeof rootRoute
     }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardImport
+      parentRoute: typeof rootRoute
+    }
     '/logout': {
       id: '/logout'
       path: '/logout'
@@ -161,17 +175,17 @@ declare module '@tanstack/react-router' {
     }
     '/dashboard/customer': {
       id: '/dashboard/customer'
-      path: '/dashboard/customer'
+      path: '/customer'
       fullPath: '/dashboard/customer'
       preLoaderRoute: typeof DashboardCustomerImport
-      parentRoute: typeof rootRoute
+      parentRoute: typeof DashboardImport
     }
     '/dashboard/health-care': {
       id: '/dashboard/health-care'
-      path: '/dashboard/health-care'
+      path: '/health-care'
       fullPath: '/dashboard/health-care'
       preLoaderRoute: typeof DashboardHealthCareImport
-      parentRoute: typeof rootRoute
+      parentRoute: typeof DashboardImport
     }
     '/(auth)/_auth/login': {
       id: '/(auth)/_auth/login'
@@ -241,30 +255,6 @@ declare module '@tanstack/react-router' {
 
 // Create and export the route tree
 
-interface authAuthRouteChildren {
-  authAuthLoginRoute: typeof authAuthLoginRoute
-  authAuthSignUpRoute: typeof authAuthSignUpRoute
-}
-
-const authAuthRouteChildren: authAuthRouteChildren = {
-  authAuthLoginRoute: authAuthLoginRoute,
-  authAuthSignUpRoute: authAuthSignUpRoute,
-}
-
-const authAuthRouteWithChildren = authAuthRoute._addFileChildren(
-  authAuthRouteChildren,
-)
-
-interface authRouteChildren {
-  authAuthRoute: typeof authAuthRouteWithChildren
-}
-
-const authRouteChildren: authRouteChildren = {
-  authAuthRoute: authAuthRouteWithChildren,
-}
-
-const authRouteWithChildren = authRoute._addFileChildren(authRouteChildren)
-
 interface DashboardCustomerRouteChildren {
   DashboardCustomerProfileRoute: typeof DashboardCustomerProfileRoute
 }
@@ -297,8 +287,47 @@ const DashboardHealthCareRouteChildren: DashboardHealthCareRouteChildren = {
 const DashboardHealthCareRouteWithChildren =
   DashboardHealthCareRoute._addFileChildren(DashboardHealthCareRouteChildren)
 
+interface DashboardRouteChildren {
+  DashboardCustomerRoute: typeof DashboardCustomerRouteWithChildren
+  DashboardHealthCareRoute: typeof DashboardHealthCareRouteWithChildren
+}
+
+const DashboardRouteChildren: DashboardRouteChildren = {
+  DashboardCustomerRoute: DashboardCustomerRouteWithChildren,
+  DashboardHealthCareRoute: DashboardHealthCareRouteWithChildren,
+}
+
+const DashboardRouteWithChildren = DashboardRoute._addFileChildren(
+  DashboardRouteChildren,
+)
+
+interface authAuthRouteChildren {
+  authAuthLoginRoute: typeof authAuthLoginRoute
+  authAuthSignUpRoute: typeof authAuthSignUpRoute
+}
+
+const authAuthRouteChildren: authAuthRouteChildren = {
+  authAuthLoginRoute: authAuthLoginRoute,
+  authAuthSignUpRoute: authAuthSignUpRoute,
+}
+
+const authAuthRouteWithChildren = authAuthRoute._addFileChildren(
+  authAuthRouteChildren,
+)
+
+interface authRouteChildren {
+  authAuthRoute: typeof authAuthRouteWithChildren
+}
+
+const authRouteChildren: authRouteChildren = {
+  authAuthRoute: authAuthRouteWithChildren,
+}
+
+const authRouteWithChildren = authRoute._addFileChildren(authRouteChildren)
+
 export interface FileRoutesByFullPath {
   '/': typeof authAuthRouteWithChildren
+  '/dashboard': typeof DashboardRouteWithChildren
   '/logout': typeof LogoutRoute
   '/dashboard/customer': typeof DashboardCustomerRouteWithChildren
   '/dashboard/health-care': typeof DashboardHealthCareRouteWithChildren
@@ -315,6 +344,7 @@ export interface FileRoutesByFullPath {
 
 export interface FileRoutesByTo {
   '/': typeof authAuthRouteWithChildren
+  '/dashboard': typeof DashboardRouteWithChildren
   '/logout': typeof LogoutRoute
   '/dashboard/customer': typeof DashboardCustomerRouteWithChildren
   '/login': typeof authAuthLoginRoute
@@ -331,6 +361,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
+  '/dashboard': typeof DashboardRouteWithChildren
   '/logout': typeof LogoutRoute
   '/(auth)': typeof authRouteWithChildren
   '/(auth)/_auth': typeof authAuthRouteWithChildren
@@ -351,6 +382,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/dashboard'
     | '/logout'
     | '/dashboard/customer'
     | '/dashboard/health-care'
@@ -366,6 +398,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/dashboard'
     | '/logout'
     | '/dashboard/customer'
     | '/login'
@@ -380,6 +413,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/dashboard'
     | '/logout'
     | '/(auth)'
     | '/(auth)/_auth'
@@ -399,18 +433,16 @@ export interface FileRouteTypes {
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  DashboardRoute: typeof DashboardRouteWithChildren
   LogoutRoute: typeof LogoutRoute
   authRoute: typeof authRouteWithChildren
-  DashboardCustomerRoute: typeof DashboardCustomerRouteWithChildren
-  DashboardHealthCareRoute: typeof DashboardHealthCareRouteWithChildren
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  DashboardRoute: DashboardRouteWithChildren,
   LogoutRoute: LogoutRoute,
   authRoute: authRouteWithChildren,
-  DashboardCustomerRoute: DashboardCustomerRouteWithChildren,
-  DashboardHealthCareRoute: DashboardHealthCareRouteWithChildren,
 }
 
 export const routeTree = rootRoute
@@ -424,14 +456,20 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
+        "/dashboard",
         "/logout",
-        "/(auth)",
-        "/dashboard/customer",
-        "/dashboard/health-care"
+        "/(auth)"
       ]
     },
     "/": {
       "filePath": "index.tsx"
+    },
+    "/dashboard": {
+      "filePath": "dashboard.tsx",
+      "children": [
+        "/dashboard/customer",
+        "/dashboard/health-care"
+      ]
     },
     "/logout": {
       "filePath": "logout.tsx"
@@ -452,12 +490,14 @@ export const routeTree = rootRoute
     },
     "/dashboard/customer": {
       "filePath": "dashboard.customer.tsx",
+      "parent": "/dashboard",
       "children": [
         "/dashboard/customer/profile"
       ]
     },
     "/dashboard/health-care": {
       "filePath": "dashboard.health-care.tsx",
+      "parent": "/dashboard",
       "children": [
         "/dashboard/health-care/add-customer",
         "/dashboard/health-care/customers",

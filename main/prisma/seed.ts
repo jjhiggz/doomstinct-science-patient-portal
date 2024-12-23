@@ -190,10 +190,10 @@ const seedUsers = async () => {
 
   console.log("✅ Created Instinct customers");
 
-  console.log("👥 Creating 1000 potential customers...");
+  console.log("👥 Creating 100 potential customers...");
 
   await prisma.user.createMany({
-    data: Array.from({ length: 1000 }, () => ({
+    data: Array.from({ length: 100 }, () => ({
       email: faker.internet.email(),
       role: "PATIENT_SIDE",
     })),
