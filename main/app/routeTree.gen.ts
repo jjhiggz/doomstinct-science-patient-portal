@@ -20,6 +20,7 @@ import { Route as DashboardCustomerImport } from './routes/dashboard.customer'
 import { Route as authAuthImport } from './routes/(auth)/_auth'
 import { Route as DashboardHealthCareIndexImport } from './routes/dashboard.health-care.index'
 import { Route as DashboardHealthCareUserImport } from './routes/dashboard.health-care.user'
+import { Route as DashboardHealthCareAddCustomerImport } from './routes/dashboard.health-care.add-customer'
 import { Route as authAuthSignUpImport } from './routes/(auth)/_auth.sign-up'
 import { Route as authAuthLoginImport } from './routes/(auth)/_auth.login'
 
@@ -74,6 +75,13 @@ const DashboardHealthCareUserRoute = DashboardHealthCareUserImport.update({
   path: '/user',
   getParentRoute: () => DashboardHealthCareRoute,
 } as any)
+
+const DashboardHealthCareAddCustomerRoute =
+  DashboardHealthCareAddCustomerImport.update({
+    id: '/add-customer',
+    path: '/add-customer',
+    getParentRoute: () => DashboardHealthCareRoute,
+  } as any)
 
 const authAuthSignUpRoute = authAuthSignUpImport.update({
   id: '/sign-up',
@@ -147,6 +155,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof authAuthSignUpImport
       parentRoute: typeof authAuthImport
     }
+    '/dashboard/health-care/add-customer': {
+      id: '/dashboard/health-care/add-customer'
+      path: '/add-customer'
+      fullPath: '/dashboard/health-care/add-customer'
+      preLoaderRoute: typeof DashboardHealthCareAddCustomerImport
+      parentRoute: typeof DashboardHealthCareImport
+    }
     '/dashboard/health-care/user': {
       id: '/dashboard/health-care/user'
       path: '/user'
@@ -191,11 +206,13 @@ const authRouteChildren: authRouteChildren = {
 const authRouteWithChildren = authRoute._addFileChildren(authRouteChildren)
 
 interface DashboardHealthCareRouteChildren {
+  DashboardHealthCareAddCustomerRoute: typeof DashboardHealthCareAddCustomerRoute
   DashboardHealthCareUserRoute: typeof DashboardHealthCareUserRoute
   DashboardHealthCareIndexRoute: typeof DashboardHealthCareIndexRoute
 }
 
 const DashboardHealthCareRouteChildren: DashboardHealthCareRouteChildren = {
+  DashboardHealthCareAddCustomerRoute: DashboardHealthCareAddCustomerRoute,
   DashboardHealthCareUserRoute: DashboardHealthCareUserRoute,
   DashboardHealthCareIndexRoute: DashboardHealthCareIndexRoute,
 }
@@ -210,6 +227,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/health-care': typeof DashboardHealthCareRouteWithChildren
   '/login': typeof authAuthLoginRoute
   '/sign-up': typeof authAuthSignUpRoute
+  '/dashboard/health-care/add-customer': typeof DashboardHealthCareAddCustomerRoute
   '/dashboard/health-care/user': typeof DashboardHealthCareUserRoute
   '/dashboard/health-care/': typeof DashboardHealthCareIndexRoute
 }
@@ -220,6 +238,7 @@ export interface FileRoutesByTo {
   '/dashboard/customer': typeof DashboardCustomerRoute
   '/login': typeof authAuthLoginRoute
   '/sign-up': typeof authAuthSignUpRoute
+  '/dashboard/health-care/add-customer': typeof DashboardHealthCareAddCustomerRoute
   '/dashboard/health-care/user': typeof DashboardHealthCareUserRoute
   '/dashboard/health-care': typeof DashboardHealthCareIndexRoute
 }
@@ -234,6 +253,7 @@ export interface FileRoutesById {
   '/dashboard/health-care': typeof DashboardHealthCareRouteWithChildren
   '/(auth)/_auth/login': typeof authAuthLoginRoute
   '/(auth)/_auth/sign-up': typeof authAuthSignUpRoute
+  '/dashboard/health-care/add-customer': typeof DashboardHealthCareAddCustomerRoute
   '/dashboard/health-care/user': typeof DashboardHealthCareUserRoute
   '/dashboard/health-care/': typeof DashboardHealthCareIndexRoute
 }
@@ -247,6 +267,7 @@ export interface FileRouteTypes {
     | '/dashboard/health-care'
     | '/login'
     | '/sign-up'
+    | '/dashboard/health-care/add-customer'
     | '/dashboard/health-care/user'
     | '/dashboard/health-care/'
   fileRoutesByTo: FileRoutesByTo
@@ -256,6 +277,7 @@ export interface FileRouteTypes {
     | '/dashboard/customer'
     | '/login'
     | '/sign-up'
+    | '/dashboard/health-care/add-customer'
     | '/dashboard/health-care/user'
     | '/dashboard/health-care'
   id:
@@ -268,6 +290,7 @@ export interface FileRouteTypes {
     | '/dashboard/health-care'
     | '/(auth)/_auth/login'
     | '/(auth)/_auth/sign-up'
+    | '/dashboard/health-care/add-customer'
     | '/dashboard/health-care/user'
     | '/dashboard/health-care/'
   fileRoutesById: FileRoutesById
@@ -332,6 +355,7 @@ export const routeTree = rootRoute
     "/dashboard/health-care": {
       "filePath": "dashboard.health-care.tsx",
       "children": [
+        "/dashboard/health-care/add-customer",
         "/dashboard/health-care/user",
         "/dashboard/health-care/"
       ]
@@ -343,6 +367,10 @@ export const routeTree = rootRoute
     "/(auth)/_auth/sign-up": {
       "filePath": "(auth)/_auth.sign-up.tsx",
       "parent": "/(auth)/_auth"
+    },
+    "/dashboard/health-care/add-customer": {
+      "filePath": "dashboard.health-care.add-customer.tsx",
+      "parent": "/dashboard/health-care"
     },
     "/dashboard/health-care/user": {
       "filePath": "dashboard.health-care.user.tsx",
