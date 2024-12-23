@@ -8,6 +8,8 @@ const clearDb = async () => {
   console.log("🧹 Clearing database...");
 
   try {
+    await prisma.message.deleteMany();
+    await prisma.chatRoom.deleteMany();
     await prisma.patientData.deleteMany();
     await prisma.patient.deleteMany();
     await prisma.customerData.deleteMany();

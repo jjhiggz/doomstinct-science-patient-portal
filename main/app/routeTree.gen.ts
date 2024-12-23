@@ -26,6 +26,7 @@ import { Route as DashboardHealthCareAddCustomerImport } from './routes/dashboar
 import { Route as DashboardCustomerProfileImport } from './routes/dashboard.customer.profile'
 import { Route as authAuthSignUpImport } from './routes/(auth)/_auth.sign-up'
 import { Route as authAuthLoginImport } from './routes/(auth)/_auth.login'
+import { Route as DashboardHealthCareChatChatIdImport } from './routes/dashboard.health-care.chat.$chatId'
 
 // Create Virtual Routes
 
@@ -118,6 +119,13 @@ const authAuthLoginRoute = authAuthLoginImport.update({
   path: '/login',
   getParentRoute: () => authAuthRoute,
 } as any)
+
+const DashboardHealthCareChatChatIdRoute =
+  DashboardHealthCareChatChatIdImport.update({
+    id: '/chat/$chatId',
+    path: '/chat/$chatId',
+    getParentRoute: () => DashboardHealthCareRoute,
+  } as any)
 
 // Populate the FileRoutesByPath interface
 
@@ -221,6 +229,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardHealthCareIndexImport
       parentRoute: typeof DashboardHealthCareImport
     }
+    '/dashboard/health-care/chat/$chatId': {
+      id: '/dashboard/health-care/chat/$chatId'
+      path: '/chat/$chatId'
+      fullPath: '/dashboard/health-care/chat/$chatId'
+      preLoaderRoute: typeof DashboardHealthCareChatChatIdImport
+      parentRoute: typeof DashboardHealthCareImport
+    }
   }
 }
 
@@ -267,6 +282,7 @@ interface DashboardHealthCareRouteChildren {
   DashboardHealthCareProfileRoute: typeof DashboardHealthCareProfileRoute
   DashboardHealthCareUserRoute: typeof DashboardHealthCareUserRoute
   DashboardHealthCareIndexRoute: typeof DashboardHealthCareIndexRoute
+  DashboardHealthCareChatChatIdRoute: typeof DashboardHealthCareChatChatIdRoute
 }
 
 const DashboardHealthCareRouteChildren: DashboardHealthCareRouteChildren = {
@@ -275,6 +291,7 @@ const DashboardHealthCareRouteChildren: DashboardHealthCareRouteChildren = {
   DashboardHealthCareProfileRoute: DashboardHealthCareProfileRoute,
   DashboardHealthCareUserRoute: DashboardHealthCareUserRoute,
   DashboardHealthCareIndexRoute: DashboardHealthCareIndexRoute,
+  DashboardHealthCareChatChatIdRoute: DashboardHealthCareChatChatIdRoute,
 }
 
 const DashboardHealthCareRouteWithChildren =
@@ -293,6 +310,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/health-care/profile': typeof DashboardHealthCareProfileRoute
   '/dashboard/health-care/user': typeof DashboardHealthCareUserRoute
   '/dashboard/health-care/': typeof DashboardHealthCareIndexRoute
+  '/dashboard/health-care/chat/$chatId': typeof DashboardHealthCareChatChatIdRoute
 }
 
 export interface FileRoutesByTo {
@@ -307,6 +325,7 @@ export interface FileRoutesByTo {
   '/dashboard/health-care/profile': typeof DashboardHealthCareProfileRoute
   '/dashboard/health-care/user': typeof DashboardHealthCareUserRoute
   '/dashboard/health-care': typeof DashboardHealthCareIndexRoute
+  '/dashboard/health-care/chat/$chatId': typeof DashboardHealthCareChatChatIdRoute
 }
 
 export interface FileRoutesById {
@@ -325,6 +344,7 @@ export interface FileRoutesById {
   '/dashboard/health-care/profile': typeof DashboardHealthCareProfileRoute
   '/dashboard/health-care/user': typeof DashboardHealthCareUserRoute
   '/dashboard/health-care/': typeof DashboardHealthCareIndexRoute
+  '/dashboard/health-care/chat/$chatId': typeof DashboardHealthCareChatChatIdRoute
 }
 
 export interface FileRouteTypes {
@@ -342,6 +362,7 @@ export interface FileRouteTypes {
     | '/dashboard/health-care/profile'
     | '/dashboard/health-care/user'
     | '/dashboard/health-care/'
+    | '/dashboard/health-care/chat/$chatId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -355,6 +376,7 @@ export interface FileRouteTypes {
     | '/dashboard/health-care/profile'
     | '/dashboard/health-care/user'
     | '/dashboard/health-care'
+    | '/dashboard/health-care/chat/$chatId'
   id:
     | '__root__'
     | '/'
@@ -371,6 +393,7 @@ export interface FileRouteTypes {
     | '/dashboard/health-care/profile'
     | '/dashboard/health-care/user'
     | '/dashboard/health-care/'
+    | '/dashboard/health-care/chat/$chatId'
   fileRoutesById: FileRoutesById
 }
 
@@ -440,7 +463,8 @@ export const routeTree = rootRoute
         "/dashboard/health-care/customers",
         "/dashboard/health-care/profile",
         "/dashboard/health-care/user",
-        "/dashboard/health-care/"
+        "/dashboard/health-care/",
+        "/dashboard/health-care/chat/$chatId"
       ]
     },
     "/(auth)/_auth/login": {
@@ -473,6 +497,10 @@ export const routeTree = rootRoute
     },
     "/dashboard/health-care/": {
       "filePath": "dashboard.health-care.index.tsx",
+      "parent": "/dashboard/health-care"
+    },
+    "/dashboard/health-care/chat/$chatId": {
+      "filePath": "dashboard.health-care.chat.$chatId.tsx",
       "parent": "/dashboard/health-care"
     }
   }

@@ -1,7 +1,12 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import {
+  createFileRoute,
+  Link,
+  redirect,
+  useNavigate,
+} from "@tanstack/react-router";
 
 import { useLoaderData } from "@tanstack/react-router";
-import { createServerFn } from "@tanstack/start";
+import { createServerFn, useServerFn } from "@tanstack/start";
 import { prisma } from "~/db";
 import { requireUserMiddleware } from "~/middleware/user.middleware";
 import { validateWithZod } from "~/utils/validateWithZod";
@@ -15,10 +20,60 @@ import {
   TableRow,
 } from "~/shadcn/components/ui/table";
 import { Button } from "~/shadcn/components/ui/button";
-import NotFound from "~/shadcn/components/not-found";
+import { MessageCircle, MessageCircleCode } from "lucide-react";
 
 const pageSize = 10;
 
+const $openChatRoom = createServerFn({ method: "POST" })
+  .middleware([requireUserMiddleware])
+  .validator(
+    validateWithZod(
+      z.object({
+        customerId: z.string(),
+      })
+    )
+  )
+  .handler(async ({ data: { customerId }, context: { user } }) => {
+    const existingChatroom = await prisma.chatRoom.findFirst({
+      where: {
+        AND: [
+          {
+            users: {
+              some: { id: customerId },
+            },
+          },
+          {
+            users: {
+              some: { id: user.id },
+            },
+          },
+        ],
+      },
+    });
+
+    if (existingChatroom)
+      throw redirect({
+        to: "/dashboard/health-care/chat/$chatId",
+        params: {
+          chatId: existingChatroom.id,
+        },
+      });
+
+    const newChatRoom = await prisma.chatRoom.create({
+      data: {
+        users: {
+          connect: [{ id: user.id }, { id: customerId }],
+        },
+      },
+    });
+
+    throw redirect({
+      to: "/dashboard/health-care/chat/$chatId",
+      params: {
+        chatId: newChatRoom.id,
+      },
+    });
+  });
 const $findCustomers = createServerFn({ method: "POST" })
   .middleware([requireUserMiddleware])
   .validator(
@@ -103,7 +158,7 @@ function RouteComponent() {
     from: "/dashboard/health-care/customers",
   });
 
-  const navigate = useNavigate();
+  const openChat = useServerFn($openChatRoom);
 
   if (customers.length === 0) {
     return (
@@ -133,11 +188,6 @@ function RouteComponent() {
                 <TableHead>Address</TableHead>
                 <TableHead>Phone</TableHead>
                 <TableHead>Preferences</TableHead>
-                <TableHead>Billing Info</TableHead>
-                <TableHead>Timezone</TableHead>
-                <TableHead>Language</TableHead>
-                <TableHead>Marketing</TableHead>
-                <TableHead>Details</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -151,11 +201,18 @@ function RouteComponent() {
                     <TableCell>{customerData?.address || "N/A"}</TableCell>
                     <TableCell>{customerData?.phone || "N/A"}</TableCell>
                     <TableCell>{customerData?.preferences || "N/A"}</TableCell>
-                    <TableCell>{customerData?.billingInfo || "N/A"}</TableCell>
-                    <TableCell>{customerData?.timezone || "N/A"}</TableCell>
-                    <TableCell>{customerData?.language || "N/A"}</TableCell>
                     <TableCell>
-                      {customerData?.marketing ? "Yes" : "No"}
+                      <Button
+                        onClick={() => {
+                          openChat({
+                            data: {
+                              customerId: customer.id,
+                            },
+                          });
+                        }}
+                      >
+                        <MessageCircle fill="white" />
+                      </Button>
                     </TableCell>
                     <TableCell>
                       <Link

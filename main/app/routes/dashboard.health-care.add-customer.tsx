@@ -21,8 +21,10 @@ import {
   Table,
 } from "~/shadcn/components/ui/table";
 import { toast } from "~/shadcn/hooks/use-toast";
+import { truncate } from "~/utils/truncate";
 import { validateWithZod } from "~/utils/validateWithZod";
 
+const truncateTo = 10;
 const pageSize = 10;
 const $findCustomers = createServerFn({ method: "POST" })
   .middleware([requireUserMiddleware])
@@ -231,19 +233,39 @@ function RouteComponent() {
                           }}
                         />
                       </TableCell>
-                      <TableCell>{customer?.email || "N/A"}</TableCell>
-                      <TableCell>{customerData?.firstName || "N/A"}</TableCell>
-                      <TableCell>{customerData?.lastName || "N/A"}</TableCell>
-                      <TableCell>{customerData?.address || "N/A"}</TableCell>
-                      <TableCell>{customerData?.phone || "N/A"}</TableCell>
                       <TableCell>
-                        {customerData?.preferences || "N/A"}
+                        {truncate(customer?.email || "N/A", truncateTo)}
                       </TableCell>
                       <TableCell>
-                        {customerData?.billingInfo || "N/A"}
+                        {truncate(customerData?.firstName || "N/A", truncateTo)}
                       </TableCell>
-                      <TableCell>{customerData?.timezone || "N/A"}</TableCell>
-                      <TableCell>{customerData?.language || "N/A"}</TableCell>
+                      <TableCell>
+                        {truncate(customerData?.lastName || "N/A", truncateTo)}
+                      </TableCell>
+                      <TableCell>
+                        {truncate(customerData?.address || "N/A", truncateTo)}
+                      </TableCell>
+                      <TableCell>
+                        {truncate(customerData?.phone || "N/A", truncateTo)}
+                      </TableCell>
+                      <TableCell>
+                        {truncate(
+                          customerData?.preferences || "N/A",
+                          truncateTo
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {truncate(
+                          customerData?.billingInfo || "N/A",
+                          truncateTo
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {truncate(customerData?.timezone || "N/A", truncateTo)}
+                      </TableCell>
+                      <TableCell>
+                        {truncate(customerData?.language || "N/A", truncateTo)}
+                      </TableCell>
                       <TableCell>
                         {customerData?.marketing ? "Yes" : "No"}
                       </TableCell>
