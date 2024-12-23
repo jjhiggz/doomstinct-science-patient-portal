@@ -24,7 +24,7 @@ function RouteComponent() {
               items: [
                 {
                   title: "Add new Customer",
-                  url: "",
+                  url: "/dashboard/health-care/add-customer",
                 },
                 {
                   title: "Edit Customer",
