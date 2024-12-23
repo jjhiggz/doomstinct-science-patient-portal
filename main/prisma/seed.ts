@@ -2,6 +2,7 @@ import { prisma } from "~/db";
 import { createUser } from "~/routes/(auth)/-helpers/auth-utils.server";
 import { addCustomerToProvider } from "./queries/add-customer-to-provider";
 import { addPatientToCustomer } from "./queries/add-patient-to-customer";
+import { faker } from "@faker-js/faker";
 
 const clearDb = async () => {
   console.log("🧹 Clearing database...");
@@ -52,7 +53,6 @@ const seedUsers = async () => {
       insuranceAccepted: ["PetCare Plus", "AnimalHealth Pro", "VetGuard"],
       staffSize: 15,
       emergencyService: true,
-      rating: 4.8,
       user: {
         connect: {
           id: instinctProvider.id,
@@ -187,6 +187,17 @@ const seedUsers = async () => {
   console.log("✅ Created pets for Alice");
 
   console.log("✅ Created Instinct customers");
+
+  console.log("👥 Creating 1000 potential customers...");
+
+  await prisma.user.createMany({
+    data: Array.from({ length: 1000 }, () => ({
+      email: faker.internet.email(),
+      role: "PATIENT_SIDE",
+    })),
+  });
+
+  console.log("✅ Created 1000 potential customers");
 
   return {
     doomstinctProvider,

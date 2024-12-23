@@ -3,12 +3,10 @@ import {
   useLoaderData,
   useNavigate,
   useRouter,
-  useSearch,
 } from "@tanstack/react-router";
 import { createServerFn, useServerFn } from "@tanstack/start";
 import { SearchIcon } from "lucide-react";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { debounce } from "remeda";
+import { useCallback, useState } from "react";
 import { z } from "zod";
 import { prisma } from "~/db";
 import { useOnDebouncedState } from "~/hooks/useOnDebounced";
@@ -25,6 +23,7 @@ import {
 import { toast } from "~/shadcn/hooks/use-toast";
 import { validateWithZod } from "~/utils/validateWithZod";
 
+const pageSize = 10;
 const $findCustomers = createServerFn({ method: "POST" })
   .middleware([requireUserMiddleware])
   .validator(
@@ -53,7 +52,7 @@ const $findCustomers = createServerFn({ method: "POST" })
         include: {
           CustomerData: true,
         },
-        take: 20,
+        take: pageSize,
       });
     }
     return await prisma.user.findMany({
@@ -83,7 +82,7 @@ const $findCustomers = createServerFn({ method: "POST" })
       include: {
         CustomerData: true,
       },
-      take: 20,
+      take: pageSize,
     });
   });
 
@@ -250,7 +249,8 @@ function RouteComponent() {
               </TableBody>
             </Table>
           </div>
-          <Button className="w-48">Add Customers</Button>
+
+          <Button className="mt-5 w-48">Add Customers</Button>
         </form>
       </div>
     </div>

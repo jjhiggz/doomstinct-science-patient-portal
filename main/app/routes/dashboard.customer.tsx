@@ -25,6 +25,9 @@ function RouteComponent() {
       <DashboardSidebar
         data={{
           navMain: [],
+          // title: "",
+          // url: "",
+          // items: [],
         }}
       />
       <SidebarInset>
