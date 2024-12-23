@@ -5,7 +5,7 @@ import {
   useRouter,
   useSearch,
 } from "@tanstack/react-router";
-import { createServerFn } from "@tanstack/start";
+import { createServerFn, useServerFn } from "@tanstack/start";
 import { SearchIcon } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { debounce } from "remeda";
@@ -13,6 +13,7 @@ import { z } from "zod";
 import { prisma } from "~/db";
 import { useOnDebouncedState } from "~/hooks/useOnDebounced";
 import { requireUserMiddleware } from "~/middleware/user.middleware";
+import { Button } from "~/shadcn/components/ui/button";
 import {
   TableBody,
   TableCell,
@@ -21,6 +22,7 @@ import {
   TableRow,
   Table,
 } from "~/shadcn/components/ui/table";
+import { toast } from "~/shadcn/hooks/use-toast";
 import { validateWithZod } from "~/utils/validateWithZod";
 
 const $findCustomers = createServerFn({ method: "POST" })
@@ -34,13 +36,18 @@ const $findCustomers = createServerFn({ method: "POST" })
         .optional()
     )
   )
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context: { user } }) => {
     const searchTerm = data?.search;
     if (!searchTerm) {
       return await prisma.user.findMany({
         where: {
           role: {
             equals: "PATIENT_SIDE",
+          },
+          healthcareProvidedBy: {
+            none: {
+              id: user.id,
+            },
           },
         },
         include: {
@@ -53,6 +60,11 @@ const $findCustomers = createServerFn({ method: "POST" })
       where: {
         role: {
           equals: "PATIENT_SIDE",
+        },
+        healthcareProvidedBy: {
+          none: {
+            id: user.id,
+          },
         },
         OR: [
           { email: { contains: searchTerm } },
@@ -73,6 +85,28 @@ const $findCustomers = createServerFn({ method: "POST" })
       },
       take: 20,
     });
+  });
+
+const $addCustomers = createServerFn({ method: "POST" })
+  .middleware([requireUserMiddleware])
+  .validator(validateWithZod(z.array(z.string())))
+  .handler(({ data, context }) => {
+    return prisma.$transaction(
+      data.map((customerId) =>
+        prisma.user.update({
+          where: {
+            id: customerId,
+          },
+          data: {
+            healthcareProvidedBy: {
+              connect: {
+                id: context.user.id,
+              },
+            },
+          },
+        })
+      )
+    );
   });
 
 export const Route = createFileRoute("/dashboard/health-care/add-customer")({
@@ -99,7 +133,11 @@ function RouteComponent() {
 
   const [searchTerm, setSearchTerm] = useState("");
 
+  const [customerSet, setCustomerSet] = useState<Set<string>>(new Set());
+
   const navigate = useNavigate();
+  const router = useRouter();
+  const addCustomers = useServerFn($addCustomers);
 
   useOnDebouncedState({
     handler: (searchTerm) => {
@@ -113,6 +151,26 @@ function RouteComponent() {
     watchState: searchTerm,
     time: 400,
   });
+
+  const handleSubmit = useCallback(
+    (e: React.FormEvent) => {
+      e.preventDefault();
+      // Process the selected customers
+      const selectedCustomers = Array.from(customerSet);
+      addCustomers({ data: selectedCustomers })
+        .then(() => {
+          toast({ title: "Added 😊", variant: "success" });
+          router.invalidate();
+        })
+        .catch(() => {
+          toast({ title: "Something went wrong 😞", variant: "destructive" });
+          router.invalidate();
+        });
+
+      // Add your form submission logic here
+    },
+    [customerSet]
+  );
 
   return (
     <div>
@@ -132,50 +190,68 @@ function RouteComponent() {
             }}
           />
         </div>
-
-        <div className="border rounded-md">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Select</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>First Name</TableHead>
-                <TableHead>Last Name</TableHead>
-                <TableHead>Address</TableHead>
-                <TableHead>Phone</TableHead>
-                <TableHead>Preferences</TableHead>
-                <TableHead>Billing Info</TableHead>
-                <TableHead>Timezone</TableHead>
-                <TableHead>Language</TableHead>
-                <TableHead>Marketing</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {customers.map((customer) => {
-                const customerData = customer.CustomerData;
-                return (
-                  <TableRow key={customerData?.id}>
-                    <TableCell className="flex justify-center items-center">
-                      <input type="checkbox" value={customer.id} />
-                    </TableCell>
-                    <TableCell>{customer?.email || "N/A"}</TableCell>
-                    <TableCell>{customerData?.firstName || "N/A"}</TableCell>
-                    <TableCell>{customerData?.lastName || "N/A"}</TableCell>
-                    <TableCell>{customerData?.address || "N/A"}</TableCell>
-                    <TableCell>{customerData?.phone || "N/A"}</TableCell>
-                    <TableCell>{customerData?.preferences || "N/A"}</TableCell>
-                    <TableCell>{customerData?.billingInfo || "N/A"}</TableCell>
-                    <TableCell>{customerData?.timezone || "N/A"}</TableCell>
-                    <TableCell>{customerData?.language || "N/A"}</TableCell>
-                    <TableCell>
-                      {customerData?.marketing ? "Yes" : "No"}
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
-        </div>
+        <form onSubmit={handleSubmit}>
+          <div className="border rounded-md">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Select</TableHead>
+                  <TableHead>Email</TableHead>
+                  <TableHead>First Name</TableHead>
+                  <TableHead>Last Name</TableHead>
+                  <TableHead>Address</TableHead>
+                  <TableHead>Phone</TableHead>
+                  <TableHead>Preferences</TableHead>
+                  <TableHead>Billing Info</TableHead>
+                  <TableHead>Timezone</TableHead>
+                  <TableHead>Language</TableHead>
+                  <TableHead>Marketing</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {customers.map((customer) => {
+                  const customerData = customer.CustomerData;
+                  return (
+                    <TableRow key={customerData?.id}>
+                      <TableCell className="flex justify-center items-center">
+                        <input
+                          type="checkbox"
+                          value={customer.id}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              customerSet.add(customer.id);
+                              setCustomerSet(customerSet);
+                            } else {
+                              customerSet.delete(customer.id);
+                              setCustomerSet(customerSet);
+                            }
+                          }}
+                        />
+                      </TableCell>
+                      <TableCell>{customer?.email || "N/A"}</TableCell>
+                      <TableCell>{customerData?.firstName || "N/A"}</TableCell>
+                      <TableCell>{customerData?.lastName || "N/A"}</TableCell>
+                      <TableCell>{customerData?.address || "N/A"}</TableCell>
+                      <TableCell>{customerData?.phone || "N/A"}</TableCell>
+                      <TableCell>
+                        {customerData?.preferences || "N/A"}
+                      </TableCell>
+                      <TableCell>
+                        {customerData?.billingInfo || "N/A"}
+                      </TableCell>
+                      <TableCell>{customerData?.timezone || "N/A"}</TableCell>
+                      <TableCell>{customerData?.language || "N/A"}</TableCell>
+                      <TableCell>
+                        {customerData?.marketing ? "Yes" : "No"}
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </div>
+          <Button className="w-48">Add Customers</Button>
+        </form>
       </div>
     </div>
   );

@@ -19,8 +19,6 @@ model User {
   role                  Role
   createdAt             DateTime            @default(now())
   updatedAt             DateTime            @updatedAt
-  stripeCustomerId      String?
-  stripePriceId         String?
   password              Password?
   passwordResetToken    PasswordResetToken?
   patientId             String?
