@@ -21,7 +21,6 @@ model User {
   updatedAt             DateTime            @updatedAt
   password              Password?
   passwordResetToken    PasswordResetToken?
-  patientId             String?
   providesHealthcareFor User[]              @relation("HealthcareProvision")
   healthcareProvidedBy  User[]              @relation("HealthcareProvision")
   Patient               Patient[]
@@ -61,7 +60,6 @@ model ProviderData {
   insuranceAccepted String[] // List of accepted insurance providers
   staffSize         Int? // Number of staff members
   emergencyService  Boolean  @default(false) // Whether 24/7 emergency service is available
-  rating            Float? // Average rating from reviews (1-5)
   user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId            String   @unique
 }
