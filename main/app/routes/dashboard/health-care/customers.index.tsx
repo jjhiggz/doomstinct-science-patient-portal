@@ -1,15 +1,16 @@
 import {
   createFileRoute,
   Link,
+  Outlet,
   redirect,
   useNavigate,
-} from '@tanstack/react-router'
-import { useLoaderData } from '@tanstack/react-router'
-import { createServerFn, useServerFn } from '@tanstack/start'
-import { prisma } from '~/db'
-import { requireUserMiddleware } from '~/middleware/user.middleware'
-import { validateWithZod } from '~/utils/validateWithZod'
-import { z } from 'zod'
+} from "@tanstack/react-router";
+import { useLoaderData } from "@tanstack/react-router";
+import { createServerFn, useServerFn } from "@tanstack/start";
+import { prisma } from "~/db";
+import { requireUserMiddleware } from "~/middleware/user.middleware";
+import { validateWithZod } from "~/utils/validateWithZod";
+import { z } from "zod";
 import {
   Table,
   TableBody,
@@ -17,20 +18,20 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '~/shadcn/components/ui/table'
-import { Button } from '~/shadcn/components/ui/button'
-import { MessageCircle, MessageCircleCode } from 'lucide-react'
+} from "~/shadcn/components/ui/table";
+import { Button } from "~/shadcn/components/ui/button";
+import { MessageCircle, MessageCircleCode } from "lucide-react";
 
-const pageSize = 10
+const pageSize = 10;
 
-const $openChatRoom = createServerFn({ method: 'POST' })
+const $openChatRoom = createServerFn({ method: "POST" })
   .middleware([requireUserMiddleware])
   .validator(
     validateWithZod(
       z.object({
         customerId: z.string(),
-      }),
-    ),
+      })
+    )
   )
   .handler(async ({ data: { customerId }, context: { user } }) => {
     const existingChatroom = await prisma.chatRoom.findFirst({
@@ -48,15 +49,15 @@ const $openChatRoom = createServerFn({ method: 'POST' })
           },
         ],
       },
-    })
+    });
 
     if (existingChatroom)
       throw redirect({
-        to: '/dashboard/health-care/chat/$chatId',
+        to: "/dashboard/health-care/chat/$chatId",
         params: {
           chatId: existingChatroom.id,
         },
-      })
+      });
 
     const newChatRoom = await prisma.chatRoom.create({
       data: {
@@ -64,16 +65,16 @@ const $openChatRoom = createServerFn({ method: 'POST' })
           connect: [{ id: user.id }, { id: customerId }],
         },
       },
-    })
+    });
 
     throw redirect({
-      to: '/dashboard/health-care/chat/$chatId',
+      to: "/dashboard/health-care/chat/$chatId",
       params: {
         chatId: newChatRoom.id,
       },
-    })
-  })
-const $findCustomers = createServerFn({ method: 'POST' })
+    });
+  });
+const $findCustomers = createServerFn({ method: "POST" })
   .middleware([requireUserMiddleware])
   .validator(
     validateWithZod(
@@ -81,16 +82,16 @@ const $findCustomers = createServerFn({ method: 'POST' })
         .object({
           search: z.string().optional(),
         })
-        .optional(),
-    ),
+        .optional()
+    )
   )
   .handler(async ({ data, context: { user } }) => {
-    const searchTerm = data?.search
+    const searchTerm = data?.search;
     if (!searchTerm) {
       return await prisma.user.findMany({
         where: {
           role: {
-            equals: 'PATIENT_SIDE',
+            equals: "PATIENT_SIDE",
           },
           healthcareProvidedBy: {
             some: {
@@ -102,12 +103,12 @@ const $findCustomers = createServerFn({ method: 'POST' })
           CustomerData: true,
         },
         take: pageSize,
-      })
+      });
     }
     return await prisma.user.findMany({
       where: {
         role: {
-          equals: 'PATIENT_SIDE',
+          equals: "PATIENT_SIDE",
         },
         healthcareProvidedBy: {
           some: {
@@ -132,13 +133,13 @@ const $findCustomers = createServerFn({ method: 'POST' })
         CustomerData: true,
       },
       take: pageSize,
-    })
-  })
+    });
+  });
 
-export const Route = createFileRoute('/dashboard/health-care/customers')({
+export const Route = createFileRoute("/dashboard/health-care/customers/")({
   component: RouteComponent,
   validateSearch: (search) => {
-    return z.object({ search: z.string().optional() }).optional().parse(search)
+    return z.object({ search: z.string().optional() }).optional().parse(search);
   },
   loaderDeps: (search) => search,
   loader: async ({ deps: { search } }) => {
@@ -148,16 +149,16 @@ export const Route = createFileRoute('/dashboard/health-care/customers')({
           search: search?.search,
         },
       }),
-    }
+    };
   },
-})
+});
 
 function RouteComponent() {
   const { customers } = useLoaderData({
-    from: '/dashboard/health-care/customers',
-  })
+    from: "/dashboard/health-care/customers/",
+  });
 
-  const openChat = useServerFn($openChatRoom)
+  const openChat = useServerFn($openChatRoom);
 
   if (customers.length === 0) {
     return (
@@ -172,7 +173,7 @@ function RouteComponent() {
           Add Customers
         </Link>
       </div>
-    )
+    );
   }
   return (
     <div>
@@ -191,15 +192,15 @@ function RouteComponent() {
             </TableHeader>
             <TableBody>
               {customers.map((customer) => {
-                const customerData = customer.CustomerData
+                const customerData = customer.CustomerData;
                 return (
                   <TableRow key={customerData?.id}>
-                    <TableCell>{customer?.email || 'N/A'}</TableCell>
-                    <TableCell>{customerData?.firstName || 'N/A'}</TableCell>
-                    <TableCell>{customerData?.lastName || 'N/A'}</TableCell>
-                    <TableCell>{customerData?.address || 'N/A'}</TableCell>
-                    <TableCell>{customerData?.phone || 'N/A'}</TableCell>
-                    <TableCell>{customerData?.preferences || 'N/A'}</TableCell>
+                    <TableCell>{customer?.email || "N/A"}</TableCell>
+                    <TableCell>{customerData?.firstName || "N/A"}</TableCell>
+                    <TableCell>{customerData?.lastName || "N/A"}</TableCell>
+                    <TableCell>{customerData?.address || "N/A"}</TableCell>
+                    <TableCell>{customerData?.phone || "N/A"}</TableCell>
+                    <TableCell>{customerData?.preferences || "N/A"}</TableCell>
                     <TableCell>
                       <Button
                         onClick={() => {
@@ -207,7 +208,7 @@ function RouteComponent() {
                             data: {
                               customerId: customer.id,
                             },
-                          })
+                          });
                         }}
                       >
                         <MessageCircle fill="white" />
@@ -215,19 +216,23 @@ function RouteComponent() {
                     </TableCell>
                     <TableCell>
                       <Link
-                        to={`/dashboard/health-care/customers/${customer.id}`}
+                        to={`/dashboard/health-care/customers/$customerId`}
+                        params={{
+                          customerId: customer.id,
+                        }}
                         className="button"
                       >
                         View Details
                       </Link>
                     </TableCell>
                   </TableRow>
-                )
+                );
               })}
             </TableBody>
           </Table>
+          <Outlet />
         </div>
       </div>
     </div>
-  )
+  );
 }

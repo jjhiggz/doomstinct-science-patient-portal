@@ -6,7 +6,7 @@ import {
   BreadcrumbList,
   BreadcrumbSeparator,
 } from "./ui/breadcrumb";
-import { ReactNode } from "react";
+import React from "react";
 
 const capitalize = (input: string) =>
   input
@@ -22,38 +22,30 @@ const normalize = (subpath: string) => {
 
 export const DashboardBreadcrumbList = () => {
   const location = useLocation();
-  const paths = location.pathname
+  const pathsRaw = location.pathname
     .split("/")
-    .filter((n) => n.trim().length > 0 && n !== "dashboard")
-    .map(normalize);
+    .filter((n) => n.trim().length > 0 && !n.includes("dashboard"));
+
+  const paths = pathsRaw.map(normalize);
 
   return (
     <Breadcrumb>
       <BreadcrumbList>
-        {paths.reduce((acc, el, i) => {
-          if (i < paths.length - 1) {
-            return [
-              ...acc,
-              ...[
-                <BreadcrumbItem key={el} />,
-                <BreadcrumbLink key={el} href="#">
-                  {el}
-                </BreadcrumbLink>,
-                <BreadcrumbSeparator />,
-              ],
-            ];
-          } else {
-            return [
-              ...acc,
-              ...[
-                <BreadcrumbItem key={el} />,
-                <BreadcrumbLink key={el} href="#">
-                  {el}
-                </BreadcrumbLink>,
-              ],
-            ];
-          }
-        }, [] as ReactNode[])}
+        {paths.map((path, index) => (
+          <React.Fragment key={path}>
+            <BreadcrumbItem>
+              <BreadcrumbLink
+                href={`/dashboard/${pathsRaw[0]}/${location.pathname
+                  .split("/")
+                  .slice(3, index + 3)
+                  .join("/")}`}
+              >
+                {path}
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            {index < paths.length - 1 && <BreadcrumbSeparator />}
+          </React.Fragment>
+        ))}
       </BreadcrumbList>
     </Breadcrumb>
   );

@@ -23,12 +23,14 @@ import { Route as DashboardHealthCareIndexImport } from './routes/dashboard/heal
 import { Route as DashboardCustomerIndexImport } from './routes/dashboard/customer/index'
 import { Route as DashboardHealthCareUserImport } from './routes/dashboard/health-care/user'
 import { Route as DashboardHealthCareProfileImport } from './routes/dashboard/health-care/profile'
-import { Route as DashboardHealthCareCustomersImport } from './routes/dashboard/health-care/customers'
 import { Route as DashboardHealthCareAddCustomerImport } from './routes/dashboard/health-care/add-customer'
+import { Route as DashboardCustomerProvidersImport } from './routes/dashboard/customer/providers'
 import { Route as DashboardCustomerProfileImport } from './routes/dashboard/customer/profile'
 import { Route as DashboardCustomerPetsImport } from './routes/dashboard/customer/pets'
 import { Route as authAuthSignUpImport } from './routes/(auth)/_auth.sign-up'
 import { Route as authAuthLoginImport } from './routes/(auth)/_auth.login'
+import { Route as DashboardHealthCareCustomersIndexImport } from './routes/dashboard/health-care/customers.index'
+import { Route as DashboardHealthCareCustomersCustomerIdImport } from './routes/dashboard/health-care/customers.$customerId'
 import { Route as DashboardHealthCareChatChatIdImport } from './routes/dashboard/health-care/chat.$chatId'
 import { Route as DashboardCustomerChatChatIdImport } from './routes/dashboard/customer/chat.$chatId'
 
@@ -104,19 +106,20 @@ const DashboardHealthCareProfileRoute = DashboardHealthCareProfileImport.update(
   } as any,
 )
 
-const DashboardHealthCareCustomersRoute =
-  DashboardHealthCareCustomersImport.update({
-    id: '/customers',
-    path: '/customers',
-    getParentRoute: () => DashboardHealthCareRoute,
-  } as any)
-
 const DashboardHealthCareAddCustomerRoute =
   DashboardHealthCareAddCustomerImport.update({
     id: '/add-customer',
     path: '/add-customer',
     getParentRoute: () => DashboardHealthCareRoute,
   } as any)
+
+const DashboardCustomerProvidersRoute = DashboardCustomerProvidersImport.update(
+  {
+    id: '/providers',
+    path: '/providers',
+    getParentRoute: () => DashboardCustomerRoute,
+  } as any,
+)
 
 const DashboardCustomerProfileRoute = DashboardCustomerProfileImport.update({
   id: '/profile',
@@ -141,6 +144,20 @@ const authAuthLoginRoute = authAuthLoginImport.update({
   path: '/login',
   getParentRoute: () => authAuthRoute,
 } as any)
+
+const DashboardHealthCareCustomersIndexRoute =
+  DashboardHealthCareCustomersIndexImport.update({
+    id: '/customers/',
+    path: '/customers/',
+    getParentRoute: () => DashboardHealthCareRoute,
+  } as any)
+
+const DashboardHealthCareCustomersCustomerIdRoute =
+  DashboardHealthCareCustomersCustomerIdImport.update({
+    id: '/customers/$customerId',
+    path: '/customers/$customerId',
+    getParentRoute: () => DashboardHealthCareRoute,
+  } as any)
 
 const DashboardHealthCareChatChatIdRoute =
   DashboardHealthCareChatChatIdImport.update({
@@ -237,18 +254,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardCustomerProfileImport
       parentRoute: typeof DashboardCustomerImport
     }
+    '/dashboard/customer/providers': {
+      id: '/dashboard/customer/providers'
+      path: '/providers'
+      fullPath: '/dashboard/customer/providers'
+      preLoaderRoute: typeof DashboardCustomerProvidersImport
+      parentRoute: typeof DashboardCustomerImport
+    }
     '/dashboard/health-care/add-customer': {
       id: '/dashboard/health-care/add-customer'
       path: '/add-customer'
       fullPath: '/dashboard/health-care/add-customer'
       preLoaderRoute: typeof DashboardHealthCareAddCustomerImport
-      parentRoute: typeof DashboardHealthCareImport
-    }
-    '/dashboard/health-care/customers': {
-      id: '/dashboard/health-care/customers'
-      path: '/customers'
-      fullPath: '/dashboard/health-care/customers'
-      preLoaderRoute: typeof DashboardHealthCareCustomersImport
       parentRoute: typeof DashboardHealthCareImport
     }
     '/dashboard/health-care/profile': {
@@ -293,6 +310,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardHealthCareChatChatIdImport
       parentRoute: typeof DashboardHealthCareImport
     }
+    '/dashboard/health-care/customers/$customerId': {
+      id: '/dashboard/health-care/customers/$customerId'
+      path: '/customers/$customerId'
+      fullPath: '/dashboard/health-care/customers/$customerId'
+      preLoaderRoute: typeof DashboardHealthCareCustomersCustomerIdImport
+      parentRoute: typeof DashboardHealthCareImport
+    }
+    '/dashboard/health-care/customers/': {
+      id: '/dashboard/health-care/customers/'
+      path: '/customers'
+      fullPath: '/dashboard/health-care/customers'
+      preLoaderRoute: typeof DashboardHealthCareCustomersIndexImport
+      parentRoute: typeof DashboardHealthCareImport
+    }
   }
 }
 
@@ -301,6 +332,7 @@ declare module '@tanstack/react-router' {
 interface DashboardCustomerRouteChildren {
   DashboardCustomerPetsRoute: typeof DashboardCustomerPetsRoute
   DashboardCustomerProfileRoute: typeof DashboardCustomerProfileRoute
+  DashboardCustomerProvidersRoute: typeof DashboardCustomerProvidersRoute
   DashboardCustomerIndexRoute: typeof DashboardCustomerIndexRoute
   DashboardCustomerChatChatIdRoute: typeof DashboardCustomerChatChatIdRoute
 }
@@ -308,6 +340,7 @@ interface DashboardCustomerRouteChildren {
 const DashboardCustomerRouteChildren: DashboardCustomerRouteChildren = {
   DashboardCustomerPetsRoute: DashboardCustomerPetsRoute,
   DashboardCustomerProfileRoute: DashboardCustomerProfileRoute,
+  DashboardCustomerProvidersRoute: DashboardCustomerProvidersRoute,
   DashboardCustomerIndexRoute: DashboardCustomerIndexRoute,
   DashboardCustomerChatChatIdRoute: DashboardCustomerChatChatIdRoute,
 }
@@ -317,20 +350,24 @@ const DashboardCustomerRouteWithChildren =
 
 interface DashboardHealthCareRouteChildren {
   DashboardHealthCareAddCustomerRoute: typeof DashboardHealthCareAddCustomerRoute
-  DashboardHealthCareCustomersRoute: typeof DashboardHealthCareCustomersRoute
   DashboardHealthCareProfileRoute: typeof DashboardHealthCareProfileRoute
   DashboardHealthCareUserRoute: typeof DashboardHealthCareUserRoute
   DashboardHealthCareIndexRoute: typeof DashboardHealthCareIndexRoute
   DashboardHealthCareChatChatIdRoute: typeof DashboardHealthCareChatChatIdRoute
+  DashboardHealthCareCustomersCustomerIdRoute: typeof DashboardHealthCareCustomersCustomerIdRoute
+  DashboardHealthCareCustomersIndexRoute: typeof DashboardHealthCareCustomersIndexRoute
 }
 
 const DashboardHealthCareRouteChildren: DashboardHealthCareRouteChildren = {
   DashboardHealthCareAddCustomerRoute: DashboardHealthCareAddCustomerRoute,
-  DashboardHealthCareCustomersRoute: DashboardHealthCareCustomersRoute,
   DashboardHealthCareProfileRoute: DashboardHealthCareProfileRoute,
   DashboardHealthCareUserRoute: DashboardHealthCareUserRoute,
   DashboardHealthCareIndexRoute: DashboardHealthCareIndexRoute,
   DashboardHealthCareChatChatIdRoute: DashboardHealthCareChatChatIdRoute,
+  DashboardHealthCareCustomersCustomerIdRoute:
+    DashboardHealthCareCustomersCustomerIdRoute,
+  DashboardHealthCareCustomersIndexRoute:
+    DashboardHealthCareCustomersIndexRoute,
 }
 
 const DashboardHealthCareRouteWithChildren =
@@ -384,14 +421,16 @@ export interface FileRoutesByFullPath {
   '/sign-up': typeof authAuthSignUpRoute
   '/dashboard/customer/pets': typeof DashboardCustomerPetsRoute
   '/dashboard/customer/profile': typeof DashboardCustomerProfileRoute
+  '/dashboard/customer/providers': typeof DashboardCustomerProvidersRoute
   '/dashboard/health-care/add-customer': typeof DashboardHealthCareAddCustomerRoute
-  '/dashboard/health-care/customers': typeof DashboardHealthCareCustomersRoute
   '/dashboard/health-care/profile': typeof DashboardHealthCareProfileRoute
   '/dashboard/health-care/user': typeof DashboardHealthCareUserRoute
   '/dashboard/customer/': typeof DashboardCustomerIndexRoute
   '/dashboard/health-care/': typeof DashboardHealthCareIndexRoute
   '/dashboard/customer/chat/$chatId': typeof DashboardCustomerChatChatIdRoute
   '/dashboard/health-care/chat/$chatId': typeof DashboardHealthCareChatChatIdRoute
+  '/dashboard/health-care/customers/$customerId': typeof DashboardHealthCareCustomersCustomerIdRoute
+  '/dashboard/health-care/customers': typeof DashboardHealthCareCustomersIndexRoute
 }
 
 export interface FileRoutesByTo {
@@ -402,14 +441,16 @@ export interface FileRoutesByTo {
   '/sign-up': typeof authAuthSignUpRoute
   '/dashboard/customer/pets': typeof DashboardCustomerPetsRoute
   '/dashboard/customer/profile': typeof DashboardCustomerProfileRoute
+  '/dashboard/customer/providers': typeof DashboardCustomerProvidersRoute
   '/dashboard/health-care/add-customer': typeof DashboardHealthCareAddCustomerRoute
-  '/dashboard/health-care/customers': typeof DashboardHealthCareCustomersRoute
   '/dashboard/health-care/profile': typeof DashboardHealthCareProfileRoute
   '/dashboard/health-care/user': typeof DashboardHealthCareUserRoute
   '/dashboard/customer': typeof DashboardCustomerIndexRoute
   '/dashboard/health-care': typeof DashboardHealthCareIndexRoute
   '/dashboard/customer/chat/$chatId': typeof DashboardCustomerChatChatIdRoute
   '/dashboard/health-care/chat/$chatId': typeof DashboardHealthCareChatChatIdRoute
+  '/dashboard/health-care/customers/$customerId': typeof DashboardHealthCareCustomersCustomerIdRoute
+  '/dashboard/health-care/customers': typeof DashboardHealthCareCustomersIndexRoute
 }
 
 export interface FileRoutesById {
@@ -425,14 +466,16 @@ export interface FileRoutesById {
   '/(auth)/_auth/sign-up': typeof authAuthSignUpRoute
   '/dashboard/customer/pets': typeof DashboardCustomerPetsRoute
   '/dashboard/customer/profile': typeof DashboardCustomerProfileRoute
+  '/dashboard/customer/providers': typeof DashboardCustomerProvidersRoute
   '/dashboard/health-care/add-customer': typeof DashboardHealthCareAddCustomerRoute
-  '/dashboard/health-care/customers': typeof DashboardHealthCareCustomersRoute
   '/dashboard/health-care/profile': typeof DashboardHealthCareProfileRoute
   '/dashboard/health-care/user': typeof DashboardHealthCareUserRoute
   '/dashboard/customer/': typeof DashboardCustomerIndexRoute
   '/dashboard/health-care/': typeof DashboardHealthCareIndexRoute
   '/dashboard/customer/chat/$chatId': typeof DashboardCustomerChatChatIdRoute
   '/dashboard/health-care/chat/$chatId': typeof DashboardHealthCareChatChatIdRoute
+  '/dashboard/health-care/customers/$customerId': typeof DashboardHealthCareCustomersCustomerIdRoute
+  '/dashboard/health-care/customers/': typeof DashboardHealthCareCustomersIndexRoute
 }
 
 export interface FileRouteTypes {
@@ -447,14 +490,16 @@ export interface FileRouteTypes {
     | '/sign-up'
     | '/dashboard/customer/pets'
     | '/dashboard/customer/profile'
+    | '/dashboard/customer/providers'
     | '/dashboard/health-care/add-customer'
-    | '/dashboard/health-care/customers'
     | '/dashboard/health-care/profile'
     | '/dashboard/health-care/user'
     | '/dashboard/customer/'
     | '/dashboard/health-care/'
     | '/dashboard/customer/chat/$chatId'
     | '/dashboard/health-care/chat/$chatId'
+    | '/dashboard/health-care/customers/$customerId'
+    | '/dashboard/health-care/customers'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -464,14 +509,16 @@ export interface FileRouteTypes {
     | '/sign-up'
     | '/dashboard/customer/pets'
     | '/dashboard/customer/profile'
+    | '/dashboard/customer/providers'
     | '/dashboard/health-care/add-customer'
-    | '/dashboard/health-care/customers'
     | '/dashboard/health-care/profile'
     | '/dashboard/health-care/user'
     | '/dashboard/customer'
     | '/dashboard/health-care'
     | '/dashboard/customer/chat/$chatId'
     | '/dashboard/health-care/chat/$chatId'
+    | '/dashboard/health-care/customers/$customerId'
+    | '/dashboard/health-care/customers'
   id:
     | '__root__'
     | '/'
@@ -485,14 +532,16 @@ export interface FileRouteTypes {
     | '/(auth)/_auth/sign-up'
     | '/dashboard/customer/pets'
     | '/dashboard/customer/profile'
+    | '/dashboard/customer/providers'
     | '/dashboard/health-care/add-customer'
-    | '/dashboard/health-care/customers'
     | '/dashboard/health-care/profile'
     | '/dashboard/health-care/user'
     | '/dashboard/customer/'
     | '/dashboard/health-care/'
     | '/dashboard/customer/chat/$chatId'
     | '/dashboard/health-care/chat/$chatId'
+    | '/dashboard/health-care/customers/$customerId'
+    | '/dashboard/health-care/customers/'
   fileRoutesById: FileRoutesById
 }
 
@@ -559,6 +608,7 @@ export const routeTree = rootRoute
       "children": [
         "/dashboard/customer/pets",
         "/dashboard/customer/profile",
+        "/dashboard/customer/providers",
         "/dashboard/customer/",
         "/dashboard/customer/chat/$chatId"
       ]
@@ -568,11 +618,12 @@ export const routeTree = rootRoute
       "parent": "/dashboard",
       "children": [
         "/dashboard/health-care/add-customer",
-        "/dashboard/health-care/customers",
         "/dashboard/health-care/profile",
         "/dashboard/health-care/user",
         "/dashboard/health-care/",
-        "/dashboard/health-care/chat/$chatId"
+        "/dashboard/health-care/chat/$chatId",
+        "/dashboard/health-care/customers/$customerId",
+        "/dashboard/health-care/customers/"
       ]
     },
     "/(auth)/_auth/login": {
@@ -591,12 +642,12 @@ export const routeTree = rootRoute
       "filePath": "dashboard/customer/profile.tsx",
       "parent": "/dashboard/customer"
     },
+    "/dashboard/customer/providers": {
+      "filePath": "dashboard/customer/providers.tsx",
+      "parent": "/dashboard/customer"
+    },
     "/dashboard/health-care/add-customer": {
       "filePath": "dashboard/health-care/add-customer.tsx",
-      "parent": "/dashboard/health-care"
-    },
-    "/dashboard/health-care/customers": {
-      "filePath": "dashboard/health-care/customers.tsx",
       "parent": "/dashboard/health-care"
     },
     "/dashboard/health-care/profile": {
@@ -621,6 +672,14 @@ export const routeTree = rootRoute
     },
     "/dashboard/health-care/chat/$chatId": {
       "filePath": "dashboard/health-care/chat.$chatId.tsx",
+      "parent": "/dashboard/health-care"
+    },
+    "/dashboard/health-care/customers/$customerId": {
+      "filePath": "dashboard/health-care/customers.$customerId.tsx",
+      "parent": "/dashboard/health-care"
+    },
+    "/dashboard/health-care/customers/": {
+      "filePath": "dashboard/health-care/customers.index.tsx",
       "parent": "/dashboard/health-care"
     }
   }
