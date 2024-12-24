@@ -21,8 +21,17 @@ defmodule ChatServerWeb.ChatRoomChannel do
   end
 
   def handle_in("message", payload, socket) do
-    IO.inspect(payload)
     broadcast!(socket, "message", payload)
+    {:noreply, socket}
+  end
+
+  def handle_in("user-typing", payload, socket) do
+    broadcast!(socket, "user-typing", payload)
+    {:noreply, socket}
+  end
+
+  def handle_in("user-typing-stop", payload, socket) do
+    broadcast!(socket, "user-typing-stop", payload)
     {:noreply, socket}
   end
 

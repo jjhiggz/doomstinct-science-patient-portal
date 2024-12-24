@@ -6,6 +6,8 @@ import { cn } from "~/shadcn/utils/classnames";
 import { $createMessage } from "../-server-fns/$create-message";
 import { PlusCircle } from "lucide-react";
 import { Input } from "~/shadcn/components/ui/input";
+import { useState } from "react";
+import { useOnDebouncedState } from "~/hooks/useOnDebounced";
 
 export const ChatRoom = ({
   firstName,
@@ -22,12 +24,56 @@ export const ChatRoom = ({
   chatId: string;
   activeUser: ClientUser;
 }) => {
-  const { dispatch, messages: allMessages } = useChatRoom({
+  const {
+    dispatch,
+    messages: allMessages,
+    usersTyping,
+  } = useChatRoom({
     initialMessages: initialMessages,
     roomId: chatId,
   });
 
+  const [content, setContent] = useState("");
+
   const createMessage = useServerFn($createMessage);
+
+  useOnDebouncedState({
+    handler: (content) => {
+      if (content.length === 0) {
+        return dispatch({
+          event: "user-typing-stop",
+          payload: {
+            byUserId: activeUser.id,
+          },
+        });
+      }
+      return dispatch({
+        event: "user-typing",
+        payload: {
+          byUserId: activeUser.id,
+        },
+      });
+    },
+    time: 100,
+    watchState: content,
+  });
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    createMessage({
+      data: {
+        content,
+        roomId: chatId,
+      },
+    }).then((message) => {
+      dispatch({
+        event: "message",
+        payload: message,
+      });
+    });
+  };
+
+  const isOtherUserTyping = usersTyping.some((id) => id !== activeUser?.id);
 
   return (
     <div className="flex flex-col gap-4 lg:px-32 p-4">
@@ -74,31 +120,20 @@ export const ChatRoom = ({
           </div>
         );
       })}
-      <form
-        className="flex gap-2 lg:w-1/2"
-        onSubmit={(e) => {
-          e.preventDefault();
-          const formData = new FormData(e.currentTarget);
-          const content = (formData.get("content") as string) ?? "";
-          if (content) {
-            // Submit form data
-            e.currentTarget.reset();
-          }
-          createMessage({
-            data: {
-              content,
-              roomId: chatId,
-            },
-          }).then((message) => {
-            dispatch({
-              event: "message",
-              payload: message,
-            });
-          });
-        }}
-      >
+      {isOtherUserTyping && (
+        <div className="text-gray-500 text-sm italic">
+          The other user is typing...
+          {/* {JSON.stringify({ usersTyping })} */}
+        </div>
+      )}
+      <form className="flex gap-2 lg:w-1/2" onSubmit={handleSubmit}>
         <PlusCircle className="h-full cursor-pointer fill-slate-300 stroke-slate-600" />
-        <Input name="content" />
+        <Input
+          name="content"
+          onChange={(e) => {
+            setContent(e.target.value);
+          }}
+        />
       </form>
     </div>
   );

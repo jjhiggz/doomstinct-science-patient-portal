@@ -1,6 +1,7 @@
 import { Message } from "@prisma/client";
 import { Channel, Socket } from "phoenix";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { unique } from "remeda";
 import { match } from "ts-pattern";
 
 const makeSocket = () => new Socket("ws://localhost:4000/socket");
@@ -52,8 +53,8 @@ export const useChatRoom = ({
     channel.current?.push(pushMessage.event, pushMessage.payload);
   }, []);
 
+  const [usersTyping, setUsersTyping] = useState<string[]>([]);
   const [messages, setMessages] = useState<Message[]>(initialMessages);
-  const [typingUserId, setTypingUserId] = useState<string | null>(null);
 
   useEffect(() => {
     const socket = new Socket("ws://localhost:4000/socket");
@@ -62,16 +63,18 @@ export const useChatRoom = ({
     socket.onMessage((e) => {
       match(e as PushMessage)
         .with({ event: "message" }, (e) => {
+          console.log(e);
           setMessages((m) => [...m, messageSchema.parse(e.payload)]);
         })
         .with({ event: "user-typing" }, (e) => {
-          e;
+          setUsersTyping((c) => unique([...c, e.payload.byUserId]));
         })
         .with({ event: "user-typing-stop" }, (e) => {
-          e;
+          setUsersTyping((c) => c.filter((el) => el !== e.payload.byUserId));
         })
         .otherwise(() => {});
     });
+
     channel.current = socket.channel(`chat_room:${roomId}`);
 
     channel.current
@@ -98,5 +101,6 @@ export const useChatRoom = ({
     dispatch,
     messages,
     setMessages,
+    usersTyping,
   };
 };
