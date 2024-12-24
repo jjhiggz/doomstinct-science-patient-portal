@@ -1,6 +1,8 @@
 import * as React from "react";
 import { GalleryVerticalEnd } from "lucide-react";
 
+import { Link, ToOptions } from "@tanstack/react-router";
+
 import {
   Sidebar,
   SidebarContent,
@@ -15,6 +17,10 @@ import {
   SidebarRail,
 } from "~/shadcn/components/ui/sidebar";
 import { useUser } from "~/hooks/useUser";
+import { useNavigate } from "@tanstack/react-router";
+import { match } from "ts-pattern";
+import { toast } from "../hooks/use-toast";
+import { Role } from "@prisma/client";
 
 // This is sample data.
 
@@ -22,20 +28,28 @@ export function DashboardSidebar({
   ...props
 }: React.ComponentProps<typeof Sidebar>) {
   const user = useUser();
+  const profileLink = (
+    {
+      ADMIN: ".",
+      PATIENT_SIDE: "/dashboard/customer/profile",
+      HEALTH_SIDE: "/dashboard/health-care/profile",
+    } satisfies Record<Role, ToOptions["to"]>
+  )[props.forUserRole];
+
   return (
     <Sidebar {...props}>
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
-              <a href="#">
+              <Link to={profileLink}>
                 <div className="flex justify-center items-center bg-sidebar-primary rounded-lg text-sidebar-primary-foreground aspect-square size-8">
                   <GalleryVerticalEnd className="size-4" />
                 </div>
                 <div className="flex flex-col gap-0.5 leading-none">
                   <span className="font-semibold">{user.email}</span>
                 </div>
-              </a>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>

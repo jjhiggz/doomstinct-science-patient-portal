@@ -8,6 +8,8 @@ const clearDb = async () => {
   console.log("🧹 Clearing database...");
 
   try {
+    await prisma.message.deleteMany();
+    await prisma.chatRoom.deleteMany();
     await prisma.patientData.deleteMany();
     await prisma.patient.deleteMany();
     await prisma.customerData.deleteMany();
@@ -96,7 +98,7 @@ const seedUsers = async () => {
   // Create patients for instinct provider
   const instinctCustomers = await Promise.all([
     createUser({
-      email: "alice.johnson@customer.com",
+      email: "jon@jon.com",
       password: "password123",
     }),
     createUser({
@@ -188,10 +190,10 @@ const seedUsers = async () => {
 
   console.log("✅ Created Instinct customers");
 
-  console.log("👥 Creating 1000 potential customers...");
+  console.log("👥 Creating 100 potential customers...");
 
   await prisma.user.createMany({
-    data: Array.from({ length: 1000 }, () => ({
+    data: Array.from({ length: 100 }, () => ({
       email: faker.internet.email(),
       role: "PATIENT_SIDE",
     })),

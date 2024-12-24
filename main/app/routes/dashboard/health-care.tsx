@@ -1,7 +1,8 @@
 import { Separator } from "@radix-ui/react-separator";
-import { createFileRoute, Outlet } from "@tanstack/react-router";
+import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { DashboardBreadcrumbList } from "~/shadcn/components/dashboard-breadcrumb-list";
 import { DashboardSidebar } from "~/shadcn/components/dashboard-sidebar";
+import { Button } from "~/shadcn/components/ui/button";
 import {
   SidebarInset,
   SidebarProvider,
@@ -10,25 +11,26 @@ import {
 
 export const Route = createFileRoute("/dashboard/health-care")({
   component: RouteComponent,
+  loader: ({ context }) => {
+    if (context.user.role === "PATIENT_SIDE")
+      throw redirect({ to: "/dashboard/customer" });
+  },
 });
 
 function RouteComponent() {
   return (
     <SidebarProvider>
       <DashboardSidebar
+        forUserRole="HEALTH_SIDE"
         data={{
           navMain: [
             {
               title: "Customers",
-              url: "",
+              url: "/dashboard/health-care/customers",
               items: [
                 {
                   title: "Add new Customer",
                   url: "/dashboard/health-care/add-customer",
-                },
-                {
-                  title: "Edit Customer",
-                  url: "",
                 },
               ],
             },
@@ -48,34 +50,7 @@ function RouteComponent() {
             },
             {
               title: "Financials",
-              url: "",
-              items: [
-                {
-                  title: "Revenue Overview",
-                  url: "",
-                },
-                {
-                  title: "Billing & Invoices",
-                  url: "",
-                },
-                {
-                  title: "Insurance Claims",
-                  url: "",
-                },
-                {
-                  title: "Expense Tracking",
-                  url: "",
-                },
-                {
-                  title: "Financial Reports",
-                  url: "",
-                },
-              ],
-            },
-            {
-              title: "Messages",
-              url: "",
-              items: [],
+              url: "/dashboard/health-care/financials",
             },
           ],
         }}
@@ -88,6 +63,9 @@ function RouteComponent() {
             <Separator orientation="vertical" className="mr-2 h-4" />
             <DashboardBreadcrumbList />
           </div>
+          <a href="/logout" className="flex flex-1 justify-end px-10">
+            <Button>Logout</Button>
+          </a>
         </header>
         <div className="flex flex-col flex-1 gap-4 p-4">
           <Outlet />

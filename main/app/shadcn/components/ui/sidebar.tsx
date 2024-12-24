@@ -16,6 +16,7 @@ import {
   TooltipTrigger,
 } from "~/shadcn/components/ui/tooltip";
 import { cn } from "~/shadcn/utils/classnames";
+import { Role } from "@prisma/client";
 
 const SIDEBAR_COOKIE_NAME = "sidebar:state";
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
@@ -177,6 +178,7 @@ const Sidebar = React.forwardRef<
     variant?: "sidebar" | "floating" | "inset";
     collapsible?: "offcanvas" | "icon" | "none";
     data: SidebarData;
+    forUserRole: Role;
   }
 >(
   (
