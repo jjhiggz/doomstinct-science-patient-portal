@@ -1,21 +1,21 @@
-import { Separator } from '@radix-ui/react-separator'
-import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
-import { DashboardBreadcrumbList } from '~/shadcn/components/dashboard-breadcrumb-list'
-import { DashboardSidebar } from '~/shadcn/components/dashboard-sidebar'
-import { Button } from '~/shadcn/components/ui/button'
+import { Separator } from "@radix-ui/react-separator";
+import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
+import { DashboardBreadcrumbList } from "~/shadcn/components/dashboard-breadcrumb-list";
+import { DashboardSidebar } from "~/shadcn/components/dashboard-sidebar";
+import { Button } from "~/shadcn/components/ui/button";
 import {
   SidebarInset,
   SidebarProvider,
   SidebarTrigger,
-} from '~/shadcn/components/ui/sidebar'
+} from "~/shadcn/components/ui/sidebar";
 
-export const Route = createFileRoute('/dashboard/health-care')({
+export const Route = createFileRoute("/dashboard/health-care")({
   component: RouteComponent,
   loader: ({ context }) => {
-    if (context.user.role === 'PATIENT_SIDE')
-      throw redirect({ to: '/dashboard/customer' })
+    if (context.user.role === "PATIENT_SIDE")
+      throw redirect({ to: "/dashboard/customer" });
   },
-})
+});
 
 function RouteComponent() {
   return (
@@ -25,59 +25,32 @@ function RouteComponent() {
         data={{
           navMain: [
             {
-              title: 'Customers',
-              url: '/dashboard/health-care/customers',
+              title: "Customers",
+              url: "/dashboard/health-care/customers",
               items: [
                 {
-                  title: 'Add new Customer',
-                  url: '/dashboard/health-care/add-customer',
+                  title: "Add new Customer",
+                  url: "/dashboard/health-care/add-customer",
                 },
               ],
             },
             {
-              title: 'Patients',
-              url: '',
+              title: "Patients",
+              url: "",
               items: [
                 {
-                  title: 'Add new Patient',
-                  url: '',
+                  title: "Add new Patient",
+                  url: "",
                 },
                 {
-                  title: 'Edit Patient',
-                  url: '',
+                  title: "Edit Patient",
+                  url: "",
                 },
               ],
             },
             {
-              title: 'Financials',
-              url: '',
-              items: [
-                {
-                  title: 'Revenue Overview',
-                  url: '',
-                },
-                {
-                  title: 'Billing & Invoices',
-                  url: '',
-                },
-                {
-                  title: 'Insurance Claims',
-                  url: '',
-                },
-                {
-                  title: 'Expense Tracking',
-                  url: '',
-                },
-                {
-                  title: 'Financial Reports',
-                  url: '',
-                },
-              ],
-            },
-            {
-              title: 'Messages',
-              url: '',
-              items: [],
+              title: "Financials",
+              url: "/dashboard/health-care/financials",
             },
           ],
         }}
@@ -99,5 +72,5 @@ function RouteComponent() {
         </div>
       </SidebarInset>
     </SidebarProvider>
-  )
+  );
 }

@@ -23,6 +23,7 @@ import { Route as DashboardHealthCareIndexImport } from './routes/dashboard/heal
 import { Route as DashboardCustomerIndexImport } from './routes/dashboard/customer/index'
 import { Route as DashboardHealthCareUserImport } from './routes/dashboard/health-care/user'
 import { Route as DashboardHealthCareProfileImport } from './routes/dashboard/health-care/profile'
+import { Route as DashboardHealthCareFinancialsImport } from './routes/dashboard/health-care/financials'
 import { Route as DashboardHealthCareAddCustomerImport } from './routes/dashboard/health-care/add-customer'
 import { Route as DashboardCustomerProvidersImport } from './routes/dashboard/customer/providers'
 import { Route as DashboardCustomerProfileImport } from './routes/dashboard/customer/profile'
@@ -105,6 +106,13 @@ const DashboardHealthCareProfileRoute = DashboardHealthCareProfileImport.update(
     getParentRoute: () => DashboardHealthCareRoute,
   } as any,
 )
+
+const DashboardHealthCareFinancialsRoute =
+  DashboardHealthCareFinancialsImport.update({
+    id: '/financials',
+    path: '/financials',
+    getParentRoute: () => DashboardHealthCareRoute,
+  } as any)
 
 const DashboardHealthCareAddCustomerRoute =
   DashboardHealthCareAddCustomerImport.update({
@@ -268,6 +276,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardHealthCareAddCustomerImport
       parentRoute: typeof DashboardHealthCareImport
     }
+    '/dashboard/health-care/financials': {
+      id: '/dashboard/health-care/financials'
+      path: '/financials'
+      fullPath: '/dashboard/health-care/financials'
+      preLoaderRoute: typeof DashboardHealthCareFinancialsImport
+      parentRoute: typeof DashboardHealthCareImport
+    }
     '/dashboard/health-care/profile': {
       id: '/dashboard/health-care/profile'
       path: '/profile'
@@ -350,6 +365,7 @@ const DashboardCustomerRouteWithChildren =
 
 interface DashboardHealthCareRouteChildren {
   DashboardHealthCareAddCustomerRoute: typeof DashboardHealthCareAddCustomerRoute
+  DashboardHealthCareFinancialsRoute: typeof DashboardHealthCareFinancialsRoute
   DashboardHealthCareProfileRoute: typeof DashboardHealthCareProfileRoute
   DashboardHealthCareUserRoute: typeof DashboardHealthCareUserRoute
   DashboardHealthCareIndexRoute: typeof DashboardHealthCareIndexRoute
@@ -360,6 +376,7 @@ interface DashboardHealthCareRouteChildren {
 
 const DashboardHealthCareRouteChildren: DashboardHealthCareRouteChildren = {
   DashboardHealthCareAddCustomerRoute: DashboardHealthCareAddCustomerRoute,
+  DashboardHealthCareFinancialsRoute: DashboardHealthCareFinancialsRoute,
   DashboardHealthCareProfileRoute: DashboardHealthCareProfileRoute,
   DashboardHealthCareUserRoute: DashboardHealthCareUserRoute,
   DashboardHealthCareIndexRoute: DashboardHealthCareIndexRoute,
@@ -423,6 +440,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/customer/profile': typeof DashboardCustomerProfileRoute
   '/dashboard/customer/providers': typeof DashboardCustomerProvidersRoute
   '/dashboard/health-care/add-customer': typeof DashboardHealthCareAddCustomerRoute
+  '/dashboard/health-care/financials': typeof DashboardHealthCareFinancialsRoute
   '/dashboard/health-care/profile': typeof DashboardHealthCareProfileRoute
   '/dashboard/health-care/user': typeof DashboardHealthCareUserRoute
   '/dashboard/customer/': typeof DashboardCustomerIndexRoute
@@ -443,6 +461,7 @@ export interface FileRoutesByTo {
   '/dashboard/customer/profile': typeof DashboardCustomerProfileRoute
   '/dashboard/customer/providers': typeof DashboardCustomerProvidersRoute
   '/dashboard/health-care/add-customer': typeof DashboardHealthCareAddCustomerRoute
+  '/dashboard/health-care/financials': typeof DashboardHealthCareFinancialsRoute
   '/dashboard/health-care/profile': typeof DashboardHealthCareProfileRoute
   '/dashboard/health-care/user': typeof DashboardHealthCareUserRoute
   '/dashboard/customer': typeof DashboardCustomerIndexRoute
@@ -468,6 +487,7 @@ export interface FileRoutesById {
   '/dashboard/customer/profile': typeof DashboardCustomerProfileRoute
   '/dashboard/customer/providers': typeof DashboardCustomerProvidersRoute
   '/dashboard/health-care/add-customer': typeof DashboardHealthCareAddCustomerRoute
+  '/dashboard/health-care/financials': typeof DashboardHealthCareFinancialsRoute
   '/dashboard/health-care/profile': typeof DashboardHealthCareProfileRoute
   '/dashboard/health-care/user': typeof DashboardHealthCareUserRoute
   '/dashboard/customer/': typeof DashboardCustomerIndexRoute
@@ -492,6 +512,7 @@ export interface FileRouteTypes {
     | '/dashboard/customer/profile'
     | '/dashboard/customer/providers'
     | '/dashboard/health-care/add-customer'
+    | '/dashboard/health-care/financials'
     | '/dashboard/health-care/profile'
     | '/dashboard/health-care/user'
     | '/dashboard/customer/'
@@ -511,6 +532,7 @@ export interface FileRouteTypes {
     | '/dashboard/customer/profile'
     | '/dashboard/customer/providers'
     | '/dashboard/health-care/add-customer'
+    | '/dashboard/health-care/financials'
     | '/dashboard/health-care/profile'
     | '/dashboard/health-care/user'
     | '/dashboard/customer'
@@ -534,6 +556,7 @@ export interface FileRouteTypes {
     | '/dashboard/customer/profile'
     | '/dashboard/customer/providers'
     | '/dashboard/health-care/add-customer'
+    | '/dashboard/health-care/financials'
     | '/dashboard/health-care/profile'
     | '/dashboard/health-care/user'
     | '/dashboard/customer/'
@@ -618,6 +641,7 @@ export const routeTree = rootRoute
       "parent": "/dashboard",
       "children": [
         "/dashboard/health-care/add-customer",
+        "/dashboard/health-care/financials",
         "/dashboard/health-care/profile",
         "/dashboard/health-care/user",
         "/dashboard/health-care/",
@@ -648,6 +672,10 @@ export const routeTree = rootRoute
     },
     "/dashboard/health-care/add-customer": {
       "filePath": "dashboard/health-care/add-customer.tsx",
+      "parent": "/dashboard/health-care"
+    },
+    "/dashboard/health-care/financials": {
+      "filePath": "dashboard/health-care/financials.tsx",
       "parent": "/dashboard/health-care"
     },
     "/dashboard/health-care/profile": {
