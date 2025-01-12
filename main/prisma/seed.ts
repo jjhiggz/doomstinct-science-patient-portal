@@ -3,6 +3,19 @@ import { createUser } from "~/routes/(auth)/-helpers/auth-utils.server";
 import { addCustomerToProvider } from "./queries/add-customer-to-provider";
 import { addPatientToCustomer } from "./queries/add-patient-to-customer";
 import { faker } from "@faker-js/faker";
+import { randomUUID } from "crypto";
+
+const maybeUndefined = <T>(input: T) => {
+  return Math.random() > 0.5 ? input : undefined;
+};
+
+const randomCharacters = (length: number) => {
+  const characters =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  return Array.from({ length }, () =>
+    characters.charAt(Math.floor(Math.random() * characters.length))
+  ).join("");
+};
 
 const clearDb = async () => {
   console.log("🧹 Clearing database...");
@@ -190,16 +203,112 @@ const seedUsers = async () => {
 
   console.log("✅ Created Instinct customers");
 
-  console.log("👥 Creating 100 potential customers...");
+  const patientCount = 10000;
+  console.log(`👥 Creating ${patientCount} potential customers...`);
 
-  await prisma.user.createMany({
-    data: Array.from({ length: 100 }, () => ({
-      email: faker.internet.email(),
+  const users = await prisma.user.createManyAndReturn({
+    data: Array.from({ length: patientCount }, () => ({
+      email: faker.internet.email() + randomCharacters(2),
       role: "PATIENT_SIDE",
     })),
   });
 
-  console.log("✅ Created 1000 potential customers");
+  await Promise.all(
+    users.map(async (user) => {
+      await prisma.user.update({
+        where: {
+          id: user.id,
+        },
+        data: {
+          CustomerData: {
+            create: {
+              firstName: maybeUndefined(faker.person.firstName()),
+              lastName: maybeUndefined(faker.person.lastName()),
+              address: maybeUndefined(faker.location.streetAddress()),
+              billingInfo: maybeUndefined(faker.finance.creditCardNumber()),
+              language: maybeUndefined(
+                faker.helpers.arrayElement(["en", "es", "fr"])
+              ),
+              marketing: maybeUndefined(faker.datatype.boolean()),
+              phone: maybeUndefined(faker.phone.number()),
+              preferences: maybeUndefined(
+                faker.helpers.arrayElement(["email", "email", "text", "none"])
+              ),
+              timezone: maybeUndefined(faker.location.timeZone()),
+            },
+          },
+          Patient: {
+            createMany: {
+              data: Array.from(
+                { length: faker.number.int({ min: 1, max: 3 }) },
+                () => ({
+                  name: faker.person.firstName(),
+                })
+              ),
+            },
+          },
+        },
+      });
+      const patients = await prisma.patient.findMany({
+        where: {
+          ownerId: user.id,
+        },
+      });
+
+      return Promise.all(
+        patients.map((patient) =>
+          prisma.patient.update({
+            where: {
+              id: patient.id,
+            },
+            data: {
+              PatientData: {
+                createMany: {
+                  data: [
+                    ...Array.from(
+                      { length: faker.number.int({ min: 1, max: 3 }) },
+                      () => ({
+                        weight: maybeUndefined(
+                          faker.number.float({ min: 2, max: 150 })
+                        ),
+                        birthDate: maybeUndefined(faker.date.birthdate()),
+                        allergies: maybeUndefined(
+                          faker.helpers.arrayElement([
+                            "Peanuts",
+                            "Dairy",
+                            "Gluten",
+                            "None",
+                          ])
+                        ),
+                        breed: maybeUndefined(
+                          faker.helpers.arrayElement(["Cat", "Dog", "Hamster"])
+                        ),
+                        sex: maybeUndefined(
+                          faker.helpers.arrayElement(["M", "F"])
+                        ),
+                        ownerNotes: maybeUndefined(
+                          faker.helpers.arrayElement([
+                            "They've been great just in for a normal check up",
+                            "hit the fence to hard and destroyed their paw",
+                          ])
+                        ),
+                        microchipId: maybeUndefined(randomUUID()),
+                        species: maybeUndefined(
+                          faker.helpers.arrayElement(["cat", "dog", "hamster"])
+                        ),
+                      })
+                    ),
+                  ],
+                },
+              },
+            },
+          })
+        )
+      );
+    })
+  );
+
+  console.log(`✅ Created ${patientCount} potential customers`);
 
   return {
     doomstinctProvider,
